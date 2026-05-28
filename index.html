@@ -125,15 +125,17 @@ main{flex:1;padding:20px 0 40px}
 .swipe-clip{overflow:hidden;width:100%}
 @media(max-width:768px){
   .swipe-clip{display:block}
+  body{overflow-x:hidden}
   .view-track{
     display:flex;
     flex-direction:row;
     will-change:transform;
     /* NO transition here — JS controls it entirely */
+    min-width:100%;
   }
   .view-track .view{
-    min-width:100vw;
-    width:100vw;
+    min-width:100%;
+    width:100%;
     flex-shrink:0;
     display:block !important;
     box-sizing:border-box;
@@ -724,11 +726,11 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
   <button class="bottom-nav-btn" onclick="showView('activity')" data-view="activity">
     <span class="tab-icon">🏃</span>Activity
   </button>
-  <button class="bottom-nav-btn" onclick="showView('insights')" data-view="insights">
-    <span class="tab-icon">💡</span>Insights
-  </button>
   <button class="bottom-nav-btn" onclick="showView('upload')" data-view="upload">
     <span class="tab-icon">⬆️</span>Upload
+  </button>
+  <button class="bottom-nav-btn" onclick="showView('insights')" data-view="insights">
+    <span class="tab-icon">💡</span>Insights
   </button>
 </nav>
 </div>
@@ -2335,7 +2337,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeChartMo
 
 
 // ─── SWIPE NAVIGATION ─────────────────────────────────────────────────────────
-const VIEWS = ['overview','heartrate','sleep','activity','insights','upload'];
+const VIEWS = ['overview','heartrate','sleep','activity','upload','insights'];
 let _curIdx = 0;
 let _touchStartX = 0, _touchStartY = 0, _touchStartTime = 0;
 let _dragging = false, _dragX = 0;
@@ -2344,20 +2346,22 @@ function isMobile() { return window.innerWidth <= 768; }
 
 function getTrack() { return document.getElementById('viewTrack'); }
 
+function getSlideWidth() {
+  // Use clip container width, not window.innerWidth, to avoid scrollbar offset
+  const clip = document.querySelector('.swipe-clip');
+  return clip ? clip.getBoundingClientRect().width : window.innerWidth;
+}
+
 function setTrackX(px, animated) {
   const track = getTrack();
   if (!track) return;
-  if (animated) {
-    track.style.transition = 'transform .32s cubic-bezier(.4,0,.2,1)';
-  } else {
-    track.style.transition = 'none';
-  }
+  track.style.transition = animated ? 'transform .32s cubic-bezier(.4,0,.2,1)' : 'none';
   track.style.transform = 'translateX(' + px + 'px)';
 }
 
 function snapTo(idx, animated) {
   _curIdx = Math.max(0, Math.min(idx, VIEWS.length - 1));
-  setTrackX(-_curIdx * window.innerWidth, animated);
+  setTrackX(-_curIdx * getSlideWidth(), animated);
 }
 
 document.addEventListener('touchstart', e => {
@@ -2387,7 +2391,7 @@ document.addEventListener('touchmove', e => {
   if ((_curIdx === 0 && dx > 0) || (_curIdx === VIEWS.length - 1 && dx < 0)) {
     bounded = dx * 0.2; // resist past edge
   }
-  setTrackX(-_curIdx * window.innerWidth + bounded, false);
+  setTrackX(-_curIdx * getSlideWidth() + bounded, false);
 }, { passive: true });
 
 document.addEventListener('touchend', e => {
@@ -2396,7 +2400,7 @@ document.addEventListener('touchend', e => {
   const dt = Date.now() - _touchStartTime;
   _dragging = false;
   _touchStartX = 0;
-  const W = window.innerWidth;
+  const W = getSlideWidth();
   const isFlick = Math.abs(dx) > 50 && dt < 300;
   const isPast  = Math.abs(dx) > W * 0.3;
   if ((isFlick || isPast) && dx < 0 && _curIdx < VIEWS.length - 1) {
