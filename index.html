@@ -11,6 +11,54 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+
+// ── Chart.js global touch/mobile defaults ─────────────────────────────────────
+if (typeof Chart !== 'undefined') {
+  // Enable index mode tooltips so touching near a point shows all values at that x
+  Chart.defaults.interaction = {
+    mode: 'index',
+    intersect: false,
+    axis: 'x'
+  };
+  // Larger touch hit radius
+  Chart.defaults.elements.point.hitRadius = 20;
+  Chart.defaults.elements.point.hoverRadius = 6;
+
+  // Crosshair plugin — draws a vertical line on hover/touch
+  const crosshairPlugin = {
+    id: 'crosshair',
+    afterDraw(chart) {
+      if (chart._crosshairX === undefined) return;
+      const ctx = chart.ctx;
+      const yAxis = chart.scales.y || Object.values(chart.scales)[0];
+      if (!yAxis) return;
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(chart._crosshairX, yAxis.top);
+      ctx.lineTo(chart._crosshairX, yAxis.bottom);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(128,128,128,0.35)';
+      ctx.setLineDash([4, 3]);
+      ctx.stroke();
+      ctx.restore();
+    },
+    afterEvent(chart, args) {
+      const evt = args.event;
+      if (evt.type === 'mousemove' || evt.type === 'touchmove') {
+        chart._crosshairX = evt.x;
+        chart.draw();
+      } else if (evt.type === 'mouseout' || evt.type === 'touchend') {
+        chart._crosshairX = undefined;
+        chart.draw();
+      }
+    }
+  };
+  Chart.register(crosshairPlugin);
+}
+
+</script>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root,[data-theme="dark"]{
@@ -153,6 +201,11 @@ main{flex:1;padding:20px 0 40px}
 /* BOTTOM TAB BAR */
 .bottom-nav{display:none}
 @media(max-width:768px){
+  /* Extend into notch/status bar area */
+  body{
+    padding-top:env(safe-area-inset-top, 0px);
+    background-color:var(--bg); /* fills status bar bg */
+  }
   /* Hide top nav on mobile */
   header nav{display:none}
   /* Show bottom tab bar */
@@ -279,6 +332,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
 .chart-expand-btn{position:absolute;top:10px;right:10px;background:var(--bg3);border:1px solid var(--border2);color:var(--text3);width:24px;height:24px;border-radius:4px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s;z-index:2;line-height:1}
 .chart-wrap:hover .chart-expand-btn{opacity:1}
 .chart-wrap{position:relative}
+.chart-wrap canvas{touch-action:pan-y}
 .chart-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center;padding:20px}
 .chart-modal-overlay.open{display:flex}
 .chart-modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);padding:20px;width:100%;max-width:1100px;max-height:90vh;display:flex;flex-direction:column;gap:12px}
@@ -718,7 +772,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
     <span class="tab-icon">🏠</span>Overview
   </button>
   <button class="bottom-nav-btn" onclick="showView('heartrate')" data-view="heartrate">
-    <span class="tab-icon">❤️</span>Heart Rate
+    <span class="tab-icon">❤️</span>Heart
   </button>
   <button class="bottom-nav-btn" onclick="showView('sleep')" data-view="sleep">
     <span class="tab-icon">🛌</span>Sleep
@@ -726,11 +780,11 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
   <button class="bottom-nav-btn" onclick="showView('activity')" data-view="activity">
     <span class="tab-icon">🏃</span>Activity
   </button>
-  <button class="bottom-nav-btn" onclick="showView('upload')" data-view="upload">
-    <span class="tab-icon">⬆️</span>Upload
-  </button>
   <button class="bottom-nav-btn" onclick="showView('insights')" data-view="insights">
     <span class="tab-icon">💡</span>Insights
+  </button>
+  <button class="bottom-nav-btn" onclick="showView('upload')" data-view="upload">
+    <span class="tab-icon">⬆️</span>Upload
   </button>
 </nav>
 </div>
@@ -2337,7 +2391,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeChartMo
 
 
 // ─── SWIPE NAVIGATION ─────────────────────────────────────────────────────────
-const VIEWS = ['overview','heartrate','sleep','activity','upload','insights'];
+const VIEWS = ['overview','heartrate','sleep','activity','insights','upload'];
 let _curIdx = 0;
 let _touchStartX = 0, _touchStartY = 0, _touchStartTime = 0;
 let _dragging = false, _dragX = 0;
@@ -2367,7 +2421,7 @@ function snapTo(idx, animated) {
 document.addEventListener('touchstart', e => {
   if (!isMobile()) return;
   // Ignore touches on scrollable/interactive elements
-  if (e.target.closest('.tf-btns, .table-scroll, .upload-grid, .sb-input, input, textarea, select, .chart-modal-overlay, canvas, .bottom-nav')) return;
+  if (e.target.closest('.tf-btns, .table-scroll, .upload-grid, .sb-input, input, textarea, select, .chart-modal-overlay, .bottom-nav')) return;
   _touchStartX = e.touches[0].clientX;
   _touchStartY = e.touches[0].clientY;
   _touchStartTime = Date.now();
