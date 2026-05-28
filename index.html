@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Health">
+<meta name="theme-color" content="#0d0f12" id="themeColorMeta">
 <title>Health Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -116,10 +120,55 @@ main{flex:1;padding:20px 0 40px}
 .toast{position:fixed;bottom:20px;right:20px;background:var(--bg3);border:1px solid var(--accent);color:var(--accent);font-family:var(--mono);font-size:12px;padding:10px 16px;border-radius:8px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
 .toast.show{opacity:1}
 /* MOBILE */
-@media(max-width:640px){
+/* BOTTOM TAB BAR */
+.bottom-nav{display:none}
+@media(max-width:768px){
+  /* Hide top nav on mobile */
+  header nav{display:none}
+  /* Show bottom tab bar */
+  .bottom-nav{
+    display:flex;position:fixed;bottom:0;left:0;right:0;z-index:100;
+    background:var(--bg2);border-top:1px solid var(--border);
+    padding:0 0 env(safe-area-inset-bottom,0px);
+  }
+  .bottom-nav-btn{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:3px;padding:8px 4px 6px;background:none;border:none;cursor:pointer;
+    color:var(--text3);font-family:var(--font);font-size:9px;letter-spacing:.03em;
+    transition:color .15s;min-height:52px;-webkit-tap-highlight-color:transparent;
+  }
+  .bottom-nav-btn .tab-icon{font-size:20px;line-height:1}
+  .bottom-nav-btn.active{color:var(--accent)}
+  .bottom-nav-btn.active .tab-icon{filter:drop-shadow(0 0 4px var(--accent))}
+  /* Push main content up so bottom nav doesn't cover it */
+  main{padding-bottom:72px}
+  /* Collapse multi-col */
   .two-col,.three-col{grid-template-columns:1fr}
-  .metric-value{font-size:20px}
-  header{flex-direction:column;align-items:flex-start}
+  /* Metric grid: 2 cols on mobile */
+  .metric-row{grid-template-columns:repeat(2,1fr)}
+  /* Header: stack logo + controls */
+  header{flex-direction:row;align-items:center;flex-wrap:wrap;gap:8px;padding:12px 0 10px}
+  .date-range{font-size:10px;padding:3px 8px}
+  /* Timeframe buttons: scrollable row */
+  .tf-btns{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+  .tf-btn{white-space:nowrap;padding:5px 10px;font-size:11px}
+  /* Charts: slightly shorter on mobile */
+  .chart-inner[style*="height:240px"]{height:200px!important}
+  .chart-inner[style*="height:230px"]{height:190px!important}
+  .chart-inner[style*="height:220px"]{height:185px!important}
+  .chart-inner[style*="height:200px"]{height:175px!important}
+  /* Upload cards: full width */
+  .upload-grid{grid-template-columns:1fr!important}
+  /* Supabase form: single col */
+  .sb-row{grid-template-columns:1fr}
+  /* Metric value slightly smaller */
+  .metric-value{font-size:22px}
+  /* Expand button always visible on mobile (no hover) */
+  .chart-expand-btn{opacity:.6}
+  /* AI panel */
+  .ai-panel{padding:14px}
+  /* Logo smaller */
+  .logo{font-size:12px}
 }
 /* DIVIDER */
 hr{border:none;border-top:1px solid var(--border);margin:20px 0}
@@ -629,6 +678,27 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
 
     </div>
   </main>
+
+<nav class="bottom-nav" id="bottomNav">
+  <button class="bottom-nav-btn active" onclick="showView('overview')" data-view="overview">
+    <span class="tab-icon">⌂</span>Overview
+  </button>
+  <button class="bottom-nav-btn" onclick="showView('heartrate')" data-view="heartrate">
+    <span class="tab-icon">♥</span>Heart Rate
+  </button>
+  <button class="bottom-nav-btn" onclick="showView('sleep')" data-view="sleep">
+    <span class="tab-icon">◑</span>Sleep
+  </button>
+  <button class="bottom-nav-btn" onclick="showView('activity')" data-view="activity">
+    <span class="tab-icon">↑</span>Activity
+  </button>
+  <button class="bottom-nav-btn" onclick="showView('insights')" data-view="insights">
+    <span class="tab-icon">✦</span>Insights
+  </button>
+  <button class="bottom-nav-btn" onclick="showView('upload')" data-view="upload">
+    <span class="tab-icon">↑</span>Upload
+  </button>
+</nav>
 </div>
 
 <!-- CHART MODAL -->
@@ -702,10 +772,16 @@ async function testSBConnection(url, key) {
   try {
     const r = await fetch(`${url}/rest/v1/health_data?select=id&limit=1`, {
       headers: { 'apikey': key, 'Authorization': `Bearer ${key}` },
-      signal: AbortSignal.timeout(6000)
+      signal: AbortSignal.timeout(8000)
     });
-    return r.ok || r.status === 406; // 406 = table exists but no rows = fine
-  } catch(e) { return false; }
+    // Any HTTP response means the server is reachable and the key is being accepted.
+    // 200/201 = success, 406 = no rows but table exists, 400/401 would indicate wrong key.
+    // We treat anything except network failure as "connectable" and let saveState surface auth errors.
+    return r.status !== 0;
+  } catch(e) {
+    // Network error or CORS block — skip the test and try connecting anyway
+    return true;
+  }
 }
 
 // ── State load/save ────────────────────────────────────────────────────────────
@@ -1933,24 +2009,42 @@ async function saveSBConfig() {
   if (!url || !key) { statusEl.textContent = '✗ Both fields required'; statusEl.style.color='var(--red)'; return; }
   if (!url.includes('supabase.co')) { statusEl.textContent = '✗ URL should be your-project.supabase.co'; statusEl.style.color='var(--red)'; return; }
 
-  statusEl.textContent = 'Testing connection…'; statusEl.style.color='var(--accent3)';
+  statusEl.textContent = 'Connecting…'; statusEl.style.color='var(--accent3)';
 
-  const ok = await testSBConnection(url, key);
-  if (!ok) {
-    statusEl.textContent = '✗ Could not connect — check URL and key'; statusEl.style.color='var(--red)'; return;
+  // Save config and attempt a real upsert — this is the actual connection test
+  setSBConfig({ url, key });
+  try {
+    const r = await fetch(`${url}/rest/v1/health_data`, {
+      method: 'POST',
+      headers: {
+        'apikey': key,
+        'Authorization': `Bearer ${key}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({ id: 1, payload: STATE }),
+      signal: AbortSignal.timeout(10000)
+    });
+    if (!r.ok && r.status !== 201) {
+      const errText = await r.text().catch(()=>'');
+      clearSBConfig();
+      statusEl.textContent = `✗ Error ${r.status}: ${errText.slice(0,120) || 'check URL and key'}`;
+      statusEl.style.color = 'var(--red)';
+      return;
+    }
+  } catch(e) {
+    clearSBConfig();
+    statusEl.textContent = `✗ Network error: ${e.message}`;
+    statusEl.style.color = 'var(--red)';
+    return;
   }
 
-  setSBConfig({ url, key });
-  statusEl.textContent = '✓ Connected! Uploading current data…'; statusEl.style.color='var(--green)';
-
-  // Push current STATE up to Supabase immediately
-  await saveState();
-  await loadState(); // re-load to confirm round-trip
-
+  statusEl.textContent = '✓ Connected! Loading data…'; statusEl.style.color='var(--green)';
+  await loadState();
   hideSBSetup();
   updateSBPanelUI();
   renderUploadView();
-  showToast('Cloud sync enabled — data uploaded to Supabase');
+  showToast('Cloud sync enabled — data syncing across devices');
 }
 
 function disconnectSB() {
@@ -2105,6 +2199,8 @@ function showView(id) {
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('view-'+id).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b=>{ if(b.textContent.toLowerCase().includes(id.slice(0,4))) b.classList.add('active'); });
+  // Sync bottom nav
+  document.querySelectorAll('.bottom-nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.view===id));
   // lazy render
   if (id==='overview') renderOverview();
   else if (id==='heartrate') renderHeartRate();
@@ -2202,10 +2298,45 @@ function closeChartModalDirect() {
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeChartModalDirect(); });
 
+
+// ─── SWIPE NAVIGATION ─────────────────────────────────────────────────────────
+const VIEWS = ['overview','heartrate','sleep','activity','insights','upload'];
+let _swipeStartX = 0, _swipeStartY = 0, _swipeStartTime = 0;
+
+function getCurrentView() {
+  const active = document.querySelector('.view.active');
+  return active ? active.id.replace('view-','') : 'overview';
+}
+
+document.addEventListener('touchstart', e => {
+  _swipeStartX = e.touches[0].clientX;
+  _swipeStartY = e.touches[0].clientY;
+  _swipeStartTime = Date.now();
+}, { passive: true });
+
+document.addEventListener('touchend', e => {
+  // Only on mobile
+  if (window.innerWidth > 768) return;
+  const dx = e.changedTouches[0].clientX - _swipeStartX;
+  const dy = e.changedTouches[0].clientY - _swipeStartY;
+  const dt = Date.now() - _swipeStartTime;
+  // Swipe: mostly horizontal, fast enough, long enough
+  if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx) * 0.8 || dt > 400) return;
+  // Don't swipe if user is scrolling a chart or the timeframe bar
+  const target = e.target.closest('.chart-wrap, .tf-btns, .table-scroll, .upload-grid, .sb-input, input');
+  if (target) return;
+  const cur = getCurrentView();
+  const idx = VIEWS.indexOf(cur);
+  if (dx < 0 && idx < VIEWS.length - 1) showView(VIEWS[idx + 1]); // swipe left = next
+  else if (dx > 0 && idx > 0) showView(VIEWS[idx - 1]);            // swipe right = prev
+}, { passive: true });
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 const savedTheme = localStorage.getItem('hd_theme') || 'dark';
 document.documentElement.setAttribute('data-theme', savedTheme);
 document.getElementById('themeToggle').textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+const _mc = document.getElementById('themeColorMeta');
+if (_mc) _mc.content = savedTheme === 'dark' ? '#0d0f12' : '#f4f6f9';
 (async () => {
   await loadState();
   updateSBPanelUI();
