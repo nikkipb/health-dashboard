@@ -120,6 +120,29 @@ main{flex:1;padding:20px 0 40px}
 .toast{position:fixed;bottom:20px;right:20px;background:var(--bg3);border:1px solid var(--accent);color:var(--accent);font-family:var(--mono);font-size:12px;padding:10px 16px;border-radius:8px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
 .toast.show{opacity:1}
 /* MOBILE */
+
+/* SWIPE TRACK — mobile slide animation */
+@media(max-width:768px){
+  .view-track{
+    display:flex;
+    transition:transform .32s cubic-bezier(.4,0,.2,1);
+    will-change:transform;
+    width:100%;
+  }
+  .view-track .view{
+    min-width:100%;
+    width:100%;
+    flex-shrink:0;
+    display:block !important; /* all views rendered, track slides */
+    opacity:1;
+  }
+}
+@media(min-width:769px){
+  .view-track{ display:contents }
+  .view-track .view{ display:none }
+  .view-track .view.active{ display:block }
+}
+
 /* BOTTOM TAB BAR */
 .bottom-nav{display:none}
 @media(max-width:768px){
@@ -280,6 +303,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
   </header>
 
   <main>
+  <div class="view-track" id="viewTrack">
     <!-- OVERVIEW -->
     <div class="view active" id="view-overview">
       <div class="tf-bar">
@@ -677,26 +701,27 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
       </div>
 
     </div>
+  </div><!-- /view-track -->
   </main>
 
 <nav class="bottom-nav" id="bottomNav">
   <button class="bottom-nav-btn active" onclick="showView('overview')" data-view="overview">
-    <span class="tab-icon">⌂</span>Overview
+    <span class="tab-icon">🏠</span>Overview
   </button>
   <button class="bottom-nav-btn" onclick="showView('heartrate')" data-view="heartrate">
-    <span class="tab-icon">♥</span>Heart Rate
+    <span class="tab-icon">❤️</span>Heart Rate
   </button>
   <button class="bottom-nav-btn" onclick="showView('sleep')" data-view="sleep">
-    <span class="tab-icon">◑</span>Sleep
+    <span class="tab-icon">🛌</span>Sleep
   </button>
   <button class="bottom-nav-btn" onclick="showView('activity')" data-view="activity">
-    <span class="tab-icon">↑</span>Activity
+    <span class="tab-icon">🏃</span>Activity
   </button>
   <button class="bottom-nav-btn" onclick="showView('insights')" data-view="insights">
-    <span class="tab-icon">✦</span>Insights
+    <span class="tab-icon">💡</span>Insights
   </button>
   <button class="bottom-nav-btn" onclick="showView('upload')" data-view="upload">
-    <span class="tab-icon">↑</span>Upload
+    <span class="tab-icon">⬆️</span>Upload
   </button>
 </nav>
 </div>
@@ -2201,6 +2226,9 @@ function showView(id) {
   document.querySelectorAll('.nav-btn').forEach(b=>{ if(b.textContent.toLowerCase().includes(id.slice(0,4))) b.classList.add('active'); });
   // Sync bottom nav
   document.querySelectorAll('.bottom-nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.view===id));
+  // Move swipe track
+  const idx = VIEWS.indexOf(id);
+  if (idx > -1) { _currentIdx = idx; updateTrackPosition(idx, true); }
   // lazy render
   if (id==='overview') renderOverview();
   else if (id==='heartrate') renderHeartRate();
@@ -2302,6 +2330,20 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeChartMo
 // ─── SWIPE NAVIGATION ─────────────────────────────────────────────────────────
 const VIEWS = ['overview','heartrate','sleep','activity','insights','upload'];
 let _swipeStartX = 0, _swipeStartY = 0, _swipeStartTime = 0;
+let _currentIdx = 0;
+let _isDragging = false;
+let _dragDeltaX = 0;
+
+function isMobile() { return window.innerWidth <= 768; }
+
+function getTrack() { return document.getElementById('viewTrack'); }
+
+function updateTrackPosition(idx, animated) {
+  const track = getTrack();
+  if (!track || !isMobile()) return;
+  track.style.transition = animated ? 'transform .32s cubic-bezier(.4,0,.2,1)' : 'none';
+  track.style.transform = `translateX(${-idx * 100}%)`;
+}
 
 function getCurrentView() {
   const active = document.querySelector('.view.active');
@@ -2309,28 +2351,63 @@ function getCurrentView() {
 }
 
 document.addEventListener('touchstart', e => {
+  if (!isMobile()) return;
+  const target = e.target.closest('.chart-wrap, .tf-btns, .table-scroll, .upload-grid, .sb-input, input, textarea, select, .chart-modal-overlay');
+  if (target) return;
   _swipeStartX = e.touches[0].clientX;
   _swipeStartY = e.touches[0].clientY;
   _swipeStartTime = Date.now();
+  _isDragging = false;
+  _dragDeltaX = 0;
+}, { passive: true });
+
+document.addEventListener('touchmove', e => {
+  if (!isMobile() || _swipeStartX === 0) return;
+  const dx = e.touches[0].clientX - _swipeStartX;
+  const dy = e.touches[0].clientY - _swipeStartY;
+  // Only track as horizontal drag if clearly horizontal
+  if (!_isDragging && Math.abs(dx) < 8) return;
+  if (!_isDragging && Math.abs(dy) > Math.abs(dx)) return; // vertical scroll — bail
+  _isDragging = true;
+  _dragDeltaX = dx;
+  // Live drag: shift the track proportionally for rubber-band feel
+  const track = getTrack();
+  if (!track) return;
+  const pct = (_dragDeltaX / window.innerWidth) * 100;
+  const clampedPct = Math.max(
+    -(_currentIdx === VIEWS.length-1 ? pct * 0.15 : 0) + pct * (_currentIdx === VIEWS.length-1 ? 0 : 1),
+    pct
+  );
+  track.style.transition = 'none';
+  track.style.transform = `translateX(calc(${-_currentIdx * 100}% + ${_dragDeltaX}px))`;
 }, { passive: true });
 
 document.addEventListener('touchend', e => {
-  // Only on mobile
-  if (window.innerWidth > 768) return;
-  const dx = e.changedTouches[0].clientX - _swipeStartX;
-  const dy = e.changedTouches[0].clientY - _swipeStartY;
+  if (!isMobile() || !_isDragging) { _swipeStartX = 0; return; }
+  const dx = _dragDeltaX;
   const dt = Date.now() - _swipeStartTime;
-  // Swipe: mostly horizontal, fast enough, long enough
-  if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx) * 0.8 || dt > 400) return;
-  // Don't swipe if user is scrolling a chart or the timeframe bar
-  const target = e.target.closest('.chart-wrap, .tf-btns, .table-scroll, .upload-grid, .sb-input, input');
-  if (target) return;
-  const cur = getCurrentView();
-  const idx = VIEWS.indexOf(cur);
-  if (dx < 0 && idx < VIEWS.length - 1) showView(VIEWS[idx + 1]); // swipe left = next
-  else if (dx > 0 && idx > 0) showView(VIEWS[idx - 1]);            // swipe right = prev
+  _isDragging = false;
+  _swipeStartX = 0;
+
+  // Commit swipe if: fast flick (>60px in <350ms) OR dragged past 30% of screen
+  const threshold = window.innerWidth * 0.3;
+  const isFlick = Math.abs(dx) > 60 && dt < 350;
+  const isPast = Math.abs(dx) > threshold;
+
+  if ((isFlick || isPast) && dx < 0 && _currentIdx < VIEWS.length - 1) {
+    showView(VIEWS[_currentIdx + 1]);
+  } else if ((isFlick || isPast) && dx > 0 && _currentIdx > 0) {
+    showView(VIEWS[_currentIdx - 1]);
+  } else {
+    // Snap back
+    updateTrackPosition(_currentIdx, true);
+  }
 }, { passive: true });
 
+// Handle resize (rotate) — reposition without animation
+window.addEventListener('resize', () => {
+  updateTrackPosition(_currentIdx, false);
+});
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 const savedTheme = localStorage.getItem('hd_theme') || 'dark';
 document.documentElement.setAttribute('data-theme', savedTheme);
