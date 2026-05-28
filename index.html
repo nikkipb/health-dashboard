@@ -122,22 +122,27 @@ main{flex:1;padding:20px 0 40px}
 /* MOBILE */
 
 /* SWIPE TRACK — mobile slide animation */
+.swipe-clip{overflow:hidden;width:100%}
 @media(max-width:768px){
+  .swipe-clip{display:block}
   .view-track{
     display:flex;
-    transition:transform .32s cubic-bezier(.4,0,.2,1);
+    flex-direction:row;
     will-change:transform;
-    width:100%;
+    /* NO transition here — JS controls it entirely */
   }
   .view-track .view{
-    min-width:100%;
-    width:100%;
+    min-width:100vw;
+    width:100vw;
     flex-shrink:0;
-    display:block !important; /* all views rendered, track slides */
-    opacity:1;
+    display:block !important;
+    box-sizing:border-box;
+    overflow-y:auto;
+    overflow-x:hidden;
   }
 }
 @media(min-width:769px){
+  .swipe-clip{display:contents}
   .view-track{ display:contents }
   .view-track .view{ display:none }
   .view-track .view.active{ display:block }
@@ -303,6 +308,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
   </header>
 
   <main>
+  <div class="swipe-clip">
   <div class="view-track" id="viewTrack">
     <!-- OVERVIEW -->
     <div class="view active" id="view-overview">
@@ -702,6 +708,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
 
     </div>
   </div><!-- /view-track -->
+  </div><!-- /swipe-clip -->
   </main>
 
 <nav class="bottom-nav" id="bottomNav">
@@ -2228,7 +2235,7 @@ function showView(id) {
   document.querySelectorAll('.bottom-nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.view===id));
   // Move swipe track
   const idx = VIEWS.indexOf(id);
-  if (idx > -1) { _currentIdx = idx; updateTrackPosition(idx, true); }
+  if (idx > -1) snapTo(idx, true);
   // lazy render
   if (id==='overview') renderOverview();
   else if (id==='heartrate') renderHeartRate();
@@ -2329,85 +2336,79 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeChartMo
 
 // ─── SWIPE NAVIGATION ─────────────────────────────────────────────────────────
 const VIEWS = ['overview','heartrate','sleep','activity','insights','upload'];
-let _swipeStartX = 0, _swipeStartY = 0, _swipeStartTime = 0;
-let _currentIdx = 0;
-let _isDragging = false;
-let _dragDeltaX = 0;
+let _curIdx = 0;
+let _touchStartX = 0, _touchStartY = 0, _touchStartTime = 0;
+let _dragging = false, _dragX = 0;
 
 function isMobile() { return window.innerWidth <= 768; }
 
 function getTrack() { return document.getElementById('viewTrack'); }
 
-function updateTrackPosition(idx, animated) {
+function setTrackX(px, animated) {
   const track = getTrack();
-  if (!track || !isMobile()) return;
-  track.style.transition = animated ? 'transform .32s cubic-bezier(.4,0,.2,1)' : 'none';
-  track.style.transform = `translateX(${-idx * 100}%)`;
+  if (!track) return;
+  if (animated) {
+    track.style.transition = 'transform .32s cubic-bezier(.4,0,.2,1)';
+  } else {
+    track.style.transition = 'none';
+  }
+  track.style.transform = 'translateX(' + px + 'px)';
 }
 
-function getCurrentView() {
-  const active = document.querySelector('.view.active');
-  return active ? active.id.replace('view-','') : 'overview';
+function snapTo(idx, animated) {
+  _curIdx = Math.max(0, Math.min(idx, VIEWS.length - 1));
+  setTrackX(-_curIdx * window.innerWidth, animated);
 }
 
 document.addEventListener('touchstart', e => {
   if (!isMobile()) return;
-  const target = e.target.closest('.chart-wrap, .tf-btns, .table-scroll, .upload-grid, .sb-input, input, textarea, select, .chart-modal-overlay');
-  if (target) return;
-  _swipeStartX = e.touches[0].clientX;
-  _swipeStartY = e.touches[0].clientY;
-  _swipeStartTime = Date.now();
-  _isDragging = false;
-  _dragDeltaX = 0;
+  // Ignore touches on scrollable/interactive elements
+  if (e.target.closest('.tf-btns, .table-scroll, .upload-grid, .sb-input, input, textarea, select, .chart-modal-overlay, canvas, .bottom-nav')) return;
+  _touchStartX = e.touches[0].clientX;
+  _touchStartY = e.touches[0].clientY;
+  _touchStartTime = Date.now();
+  _dragging = false;
+  _dragX = 0;
 }, { passive: true });
 
 document.addEventListener('touchmove', e => {
-  if (!isMobile() || _swipeStartX === 0) return;
-  const dx = e.touches[0].clientX - _swipeStartX;
-  const dy = e.touches[0].clientY - _swipeStartY;
-  // Only track as horizontal drag if clearly horizontal
-  if (!_isDragging && Math.abs(dx) < 8) return;
-  if (!_isDragging && Math.abs(dy) > Math.abs(dx)) return; // vertical scroll — bail
-  _isDragging = true;
-  _dragDeltaX = dx;
-  // Live drag: shift the track proportionally for rubber-band feel
-  const track = getTrack();
-  if (!track) return;
-  const pct = (_dragDeltaX / window.innerWidth) * 100;
-  const clampedPct = Math.max(
-    -(_currentIdx === VIEWS.length-1 ? pct * 0.15 : 0) + pct * (_currentIdx === VIEWS.length-1 ? 0 : 1),
-    pct
-  );
-  track.style.transition = 'none';
-  track.style.transform = `translateX(calc(${-_currentIdx * 100}% + ${_dragDeltaX}px))`;
+  if (!isMobile() || _touchStartX === 0) return;
+  const dx = e.touches[0].clientX - _touchStartX;
+  const dy = e.touches[0].clientY - _touchStartY;
+  // Decide: horizontal or vertical?
+  if (!_dragging) {
+    if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return; // not moved enough yet
+    if (Math.abs(dy) >= Math.abs(dx)) { _touchStartX = 0; return; } // vertical — release
+    _dragging = true;
+  }
+  _dragX = dx;
+  // Rubber-band at edges
+  let bounded = dx;
+  if ((_curIdx === 0 && dx > 0) || (_curIdx === VIEWS.length - 1 && dx < 0)) {
+    bounded = dx * 0.2; // resist past edge
+  }
+  setTrackX(-_curIdx * window.innerWidth + bounded, false);
 }, { passive: true });
 
 document.addEventListener('touchend', e => {
-  if (!isMobile() || !_isDragging) { _swipeStartX = 0; return; }
-  const dx = _dragDeltaX;
-  const dt = Date.now() - _swipeStartTime;
-  _isDragging = false;
-  _swipeStartX = 0;
-
-  // Commit swipe if: fast flick (>60px in <350ms) OR dragged past 30% of screen
-  const threshold = window.innerWidth * 0.3;
-  const isFlick = Math.abs(dx) > 60 && dt < 350;
-  const isPast = Math.abs(dx) > threshold;
-
-  if ((isFlick || isPast) && dx < 0 && _currentIdx < VIEWS.length - 1) {
-    showView(VIEWS[_currentIdx + 1]);
-  } else if ((isFlick || isPast) && dx > 0 && _currentIdx > 0) {
-    showView(VIEWS[_currentIdx - 1]);
+  if (!isMobile() || !_dragging) { _touchStartX = 0; _dragging = false; return; }
+  const dx = _dragX;
+  const dt = Date.now() - _touchStartTime;
+  _dragging = false;
+  _touchStartX = 0;
+  const W = window.innerWidth;
+  const isFlick = Math.abs(dx) > 50 && dt < 300;
+  const isPast  = Math.abs(dx) > W * 0.3;
+  if ((isFlick || isPast) && dx < 0 && _curIdx < VIEWS.length - 1) {
+    showView(VIEWS[_curIdx + 1]);
+  } else if ((isFlick || isPast) && dx > 0 && _curIdx > 0) {
+    showView(VIEWS[_curIdx - 1]);
   } else {
-    // Snap back
-    updateTrackPosition(_currentIdx, true);
+    snapTo(_curIdx, true); // snap back
   }
 }, { passive: true });
 
-// Handle resize (rotate) — reposition without animation
-window.addEventListener('resize', () => {
-  updateTrackPosition(_currentIdx, false);
-});
+window.addEventListener('resize', () => { snapTo(_curIdx, false); });
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 const savedTheme = localStorage.getItem('hd_theme') || 'dark';
 document.documentElement.setAttribute('data-theme', savedTheme);
