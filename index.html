@@ -333,7 +333,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
 .chart-wrap:hover .chart-expand-btn{opacity:1}
 .chart-wrap{position:relative}
 .chart-wrap canvas{touch-action:pan-y}
-.chart-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.chart-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center;padding:20px;touch-action:none;overscroll-behavior:contain}
 .chart-modal-overlay.open{display:flex}
 .chart-modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);padding:20px;width:100%;max-width:1100px;max-height:90vh;display:flex;flex-direction:column;gap:12px}
 .chart-modal-header{display:flex;align-items:center;justify-content:space-between}
@@ -602,68 +602,6 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
     </div>
 
     <!-- UPLOAD -->
-    <div class="view" id="view-upload">
-      <!-- CLOUD SYNC CONFIG -->
-      <div class="sb-panel" id="sbPanel">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:4px">
-          <div>
-            <div style="font-size:15px;font-weight:500;margin-bottom:2px">☁ Cloud Sync — Supabase</div>
-            <div style="font-size:12px;color:var(--text3)" id="sbStatusLine">Not configured — data is stored locally in this browser only.</div>
-          </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap" id="sbActions">
-            <button class="sb-btn sb-btn-secondary" onclick="showSBSetup()">Configure</button>
-          </div>
-        </div>
-        <div id="sbSetupForm" style="display:none;margin-top:16px">
-          <div class="sb-row">
-            <div>
-              <label style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Supabase Project URL</label>
-              <input class="sb-input" id="sbUrl" type="text" placeholder="https://xxxxxxxxxxxx.supabase.co" autocomplete="off" spellcheck="false">
-            </div>
-            <div>
-              <label style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Anon / Public Key</label>
-              <input class="sb-input" id="sbKey" type="password" placeholder="eyJhbGci…" autocomplete="off">
-            </div>
-          </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-            <button class="sb-btn sb-btn-primary" onclick="saveSBConfig()">Connect & sync</button>
-            <button class="sb-btn sb-btn-secondary" onclick="hideSBSetup()">Cancel</button>
-            <div class="sb-status" id="sbFormStatus"></div>
-          </div>
-          <div class="sb-instructions">
-            <strong style="color:var(--text)">One-time Supabase setup (5 min, free):</strong>
-            <ol style="margin-top:8px">
-              <li>Go to <strong>supabase.com</strong> → New project (free tier)</li>
-              <li>Once created, go to <strong>SQL Editor</strong> and run:<br>
-                <code>create table health_data (id int primary key, payload jsonb);</code>
-              </li>
-              <li>Go to <strong>Project Settings → API</strong></li>
-              <li>Copy <strong>Project URL</strong> → paste above</li>
-              <li>Copy <strong>anon / public</strong> key → paste above</li>
-              <li>Click <strong>Connect &amp; sync</strong> — your data uploads instantly</li>
-            </ol>
-            <div style="margin-top:8px;color:var(--text3)">Your data is stored in your own private Supabase project. Only you have access.</div>
-          </div>
-        </div>
-      </div>
-      <div class="upload-panel">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
-          <div>
-            <div style="font-size:15px;font-weight:500;margin-bottom:4px">Upload wearable exports</div>
-            <div style="font-size:12px;color:var(--text3)">New data is merged into existing records. Duplicate dates are overwritten with the new file's values.</div>
-          </div>
-          <button class="upload-btn" style="width:auto;padding:8px 16px;border-color:var(--accent4);color:var(--accent4)" onclick="clearAllData()">Clear all data</button>
-        </div>
-        <div class="upload-grid" id="upload-grid"></div>
-      </div>
-      <div class="upload-panel">
-        <div style="font-size:13px;font-weight:500;margin-bottom:12px;color:var(--text2)">Data coverage</div>
-        <div id="coverage-table" style="font-size:12px;color:var(--text3)">No data loaded.</div>
-      </div>
-    </div>
-
-
-    <!-- INSIGHTS -->
     <div class="view" id="view-insights">
       <div class="tf-bar">
         <div class="tf-btns" id="tf-insights">
@@ -763,7 +701,69 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
       </div>
 
     </div>
-  </div><!-- /view-track -->
+<div class="view" id="view-upload">
+      <!-- CLOUD SYNC CONFIG -->
+      <div class="sb-panel" id="sbPanel">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:4px">
+          <div>
+            <div style="font-size:15px;font-weight:500;margin-bottom:2px">☁ Cloud Sync — Supabase</div>
+            <div style="font-size:12px;color:var(--text3)" id="sbStatusLine">Not configured — data is stored locally in this browser only.</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap" id="sbActions">
+            <button class="sb-btn sb-btn-secondary" onclick="showSBSetup()">Configure</button>
+          </div>
+        </div>
+        <div id="sbSetupForm" style="display:none;margin-top:16px">
+          <div class="sb-row">
+            <div>
+              <label style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Supabase Project URL</label>
+              <input class="sb-input" id="sbUrl" type="text" placeholder="https://xxxxxxxxxxxx.supabase.co" autocomplete="off" spellcheck="false">
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Anon / Public Key</label>
+              <input class="sb-input" id="sbKey" type="password" placeholder="eyJhbGci…" autocomplete="off">
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <button class="sb-btn sb-btn-primary" onclick="saveSBConfig()">Connect & sync</button>
+            <button class="sb-btn sb-btn-secondary" onclick="hideSBSetup()">Cancel</button>
+            <div class="sb-status" id="sbFormStatus"></div>
+          </div>
+          <div class="sb-instructions">
+            <strong style="color:var(--text)">One-time Supabase setup (5 min, free):</strong>
+            <ol style="margin-top:8px">
+              <li>Go to <strong>supabase.com</strong> → New project (free tier)</li>
+              <li>Once created, go to <strong>SQL Editor</strong> and run:<br>
+                <code>create table health_data (id int primary key, payload jsonb);</code>
+              </li>
+              <li>Go to <strong>Project Settings → API</strong></li>
+              <li>Copy <strong>Project URL</strong> → paste above</li>
+              <li>Copy <strong>anon / public</strong> key → paste above</li>
+              <li>Click <strong>Connect &amp; sync</strong> — your data uploads instantly</li>
+            </ol>
+            <div style="margin-top:8px;color:var(--text3)">Your data is stored in your own private Supabase project. Only you have access.</div>
+          </div>
+        </div>
+      </div>
+      <div class="upload-panel">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+          <div>
+            <div style="font-size:15px;font-weight:500;margin-bottom:4px">Upload wearable exports</div>
+            <div style="font-size:12px;color:var(--text3)">New data is merged into existing records. Duplicate dates are overwritten with the new file's values.</div>
+          </div>
+          <button class="upload-btn" style="width:auto;padding:8px 16px;border-color:var(--accent4);color:var(--accent4)" onclick="clearAllData()">Clear all data</button>
+        </div>
+        <div class="upload-grid" id="upload-grid"></div>
+      </div>
+      <div class="upload-panel">
+        <div style="font-size:13px;font-weight:500;margin-bottom:12px;color:var(--text2)">Data coverage</div>
+        <div id="coverage-table" style="font-size:12px;color:var(--text3)">No data loaded.</div>
+      </div>
+    </div>
+
+
+    <!-- INSIGHTS -->
+      </div><!-- /view-track -->
   </div><!-- /swipe-clip -->
   </main>
 
@@ -2337,6 +2337,8 @@ function openChartModal(sourceCanvas) {
   if (srcLegend) legendEl.innerHTML = srcLegend.innerHTML;
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
+  document.body.style.position = 'fixed';
+  document.body.style.width = '100%';
   if (modalChart) { modalChart.destroy(); modalChart = null; }
 
   // Re-use the SAME datasets/options object references (no JSON cloning — that strips functions)
@@ -2385,6 +2387,8 @@ function closeChartModal(e) {
 function closeChartModalDirect() {
   document.getElementById('chartModal').classList.remove('open');
   document.body.style.overflow = '';
+  document.body.style.position = '';
+  document.body.style.width = '';
   if (modalChart) { modalChart.destroy(); modalChart = null; }
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeChartModalDirect(); });
@@ -2421,6 +2425,7 @@ function snapTo(idx, animated) {
 document.addEventListener('touchstart', e => {
   if (!isMobile()) return;
   // Ignore touches on scrollable/interactive elements
+  if (document.getElementById('chartModal')?.classList.contains('open')) return;
   if (e.target.closest('.tf-btns, .table-scroll, .upload-grid, .sb-input, input, textarea, select, .chart-modal-overlay, .bottom-nav')) return;
   _touchStartX = e.touches[0].clientX;
   _touchStartY = e.touches[0].clientY;
