@@ -204,8 +204,27 @@ main{flex:1;padding:20px 0 40px}
   /* Extend into notch/status bar area */
   body{
     padding-top:env(safe-area-inset-top, 0px);
-    background-color:var(--bg); /* fills status bar bg */
+    background-color:var(--bg);
   }
+  /* Centre chat button in bottom nav */
+  .bottom-nav-centre{
+    display:flex;align-items:center;justify-content:center;
+    flex:0 0 64px;position:relative;
+  }
+  .bottom-nav-chat{
+    position:absolute;bottom:6px;
+    width:54px;height:54px;border-radius:50%;
+    background:var(--accent);border:3px solid var(--bg2);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    box-shadow:0 4px 16px rgba(79,209,197,0.45);
+    transition:transform .15s,box-shadow .15s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .bottom-nav-chat:active{transform:scale(.93)}
+  .bottom-nav-chat.open{background:var(--bg3);box-shadow:0 2px 8px rgba(0,0,0,0.3)}
+  /* Hide the floating fab on mobile */
+  .chat-fab{display:none!important}
   /* Hide top nav on mobile */
   header nav{display:none}
   /* Show bottom tab bar */
@@ -308,6 +327,13 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
   transform:translateY(110%);
   transition:transform .32s cubic-bezier(.4,0,.2,1);
   box-shadow:0 -8px 40px rgba(0,0,0,0.25);
+}
+@media(max-width:768px){
+  .chat-panel{
+    height:85vh;
+    border-radius:24px 24px 0 0;
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
 }
 .chat-panel.open{transform:translateY(0)}
 @media(min-width:769px){
@@ -937,6 +963,12 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
   <button class="bottom-nav-btn" onclick="showView('sleep')" data-view="sleep">
     <span class="tab-icon">🛌</span>Sleep
   </button>
+  <!-- Centre chat action button -->
+  <div class="bottom-nav-centre">
+    <button class="bottom-nav-chat" onclick="toggleChat()" id="bottomChatBtn" title="Ask your data">
+      <span style="font-size:26px;line-height:1">💬</span>
+    </button>
+  </div>
   <button class="bottom-nav-btn" onclick="showView('activity')" data-view="activity">
     <span class="tab-icon">🏃</span>Activity
   </button>
@@ -2592,6 +2624,8 @@ function toggleChat() {
   document.getElementById('chatPanel').classList.toggle('open', CHAT_OPEN);
   document.getElementById('chatFab').classList.toggle('open', CHAT_OPEN);
   document.getElementById('chatFab').textContent = CHAT_OPEN ? '✕' : '💬';
+  const centreBtn = document.getElementById('bottomChatBtn');
+  if (centreBtn) centreBtn.classList.toggle('open', CHAT_OPEN);
   if (CHAT_OPEN) {
     setTimeout(() => document.getElementById('chatInput')?.focus(), 350);
     const warn = document.getElementById('chatKeyWarning');
