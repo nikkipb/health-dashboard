@@ -882,6 +882,30 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
           </div>
         </div>
       </div>
+
+      <!-- GROQ API KEY -->
+      <div class="sb-panel" id="groqPanel" style="margin-bottom:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:4px">
+          <div>
+            <div style="font-size:15px;font-weight:500;margin-bottom:2px">🤖 AI Chat — Groq API Key</div>
+            <div style="font-size:12px;color:var(--text3)" id="groqStatusLine">Not configured — AI chat will use basic fallback answers.</div>
+          </div>
+          <div id="groqActions">
+            <button class="sb-btn sb-btn-secondary" onclick="showGroqSetup()">Configure</button>
+          </div>
+        </div>
+        <div id="groqSetupForm" style="display:none;margin-top:14px">
+          <div style="margin-bottom:8px">
+            <label style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Groq API Key</label>
+            <input class="sb-input" id="groqKeyInput" type="password" placeholder="gsk_..." autocomplete="off" style="margin-top:6px">
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <button class="sb-btn sb-btn-primary" onclick="saveGroqKey()">Save key</button>
+            <button class="sb-btn sb-btn-secondary" onclick="hideGroqSetup()">Cancel</button>
+            <span style="font-size:11px;color:var(--text3)">Free at <a href="https://console.groq.com" target="_blank" style="color:var(--accent)">console.groq.com</a> — no credit card</span>
+          </div>
+        </div>
+      </div>
       <div class="upload-panel">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
           <div>
@@ -956,6 +980,9 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
       <div class="chat-empty-title">Ask anything about your health data</div>
       <div class="chat-empty-sub">Questions are answered using only your actual numbers — no generic advice.</div>
       <div class="chat-starters">
+        <div id="chatKeyWarning" style="display:none;font-size:11px;color:var(--accent3);background:var(--bg3);border:1px solid var(--accent3);border-radius:6px;padding:8px 12px;margin-bottom:4px">
+          ⚠ Add your free Groq API key in <strong>Upload → AI Chat Settings</strong> for real AI answers.
+        </div>
         <button class="chat-starter" onclick="sendChatMessage('When do I sleep best?')">When do I sleep best?</button>
         <button class="chat-starter" onclick="sendChatMessage('Is my fitness improving?')">Is my fitness improving?</button>
         <button class="chat-starter" onclick="sendChatMessage('What were my most active days?')">What were my most active days?</button>
@@ -1605,6 +1632,7 @@ function disconnectSB() {
 
 function renderUploadView() {
   updateSBPanelUI();
+  updateGroqKeyUI();
   const grid = document.getElementById('upload-grid');
   grid.innerHTML = FILE_CONFIGS.map(c => {
     const data = STATE[c.stateKey] || [];
@@ -2513,6 +2541,47 @@ function toggleTheme() {
 }
 
 
+
+// ─── GROQ KEY UI ──────────────────────────────────────────────────────────────
+function showGroqSetup() {
+  document.getElementById('groqSetupForm').style.display = 'block';
+  const k = localStorage.getItem('hd_groq_key');
+  if (k) document.getElementById('groqKeyInput').value = k;
+}
+function hideGroqSetup() {
+  document.getElementById('groqSetupForm').style.display = 'none';
+}
+function saveGroqKey() {
+  const key = (document.getElementById('groqKeyInput')?.value||'').trim();
+  if (!key) { showToast('Please enter an API key'); return; }
+  if (!key.startsWith('gsk_')) { showToast('Key should start with gsk_'); return; }
+  localStorage.setItem('hd_groq_key', key);
+  updateGroqKeyUI();
+  hideGroqSetup();
+  showToast('Groq API key saved — AI chat is ready!');
+}
+function updateGroqKeyUI() {
+  const key = localStorage.getItem('hd_groq_key');
+  const panel = document.getElementById('groqPanel');
+  const statusLine = document.getElementById('groqStatusLine');
+  const actions = document.getElementById('groqActions');
+  if (!panel) return;
+  if (key) {
+    panel.className = 'sb-panel sb-connected';
+    if (statusLine) statusLine.innerHTML = '<span style="color:var(--green)">✓ Configured</span> — AI chat will answer questions from your real data';
+    if (actions) actions.innerHTML = '<button class="sb-btn sb-btn-secondary" onclick="showGroqSetup()">Edit</button><button class="sb-btn sb-btn-secondary" style="color:var(--accent4);border-color:var(--accent4)" onclick="removeGroqKey()">Remove</button>';
+  } else {
+    panel.className = 'sb-panel';
+    if (statusLine) statusLine.textContent = 'Not configured — AI chat will use basic fallback answers.';
+    if (actions) actions.innerHTML = '<button class="sb-btn sb-btn-secondary" onclick="showGroqSetup()">Configure</button>';
+  }
+}
+function removeGroqKey() {
+  localStorage.removeItem('hd_groq_key');
+  updateGroqKeyUI();
+  showToast('Groq key removed');
+}
+
 // ─── ASK AI CHAT ──────────────────────────────────────────────────────────────
 let CHAT_OPEN = false;
 let CHAT_HISTORY = []; // {role, content}
@@ -2523,7 +2592,11 @@ function toggleChat() {
   document.getElementById('chatPanel').classList.toggle('open', CHAT_OPEN);
   document.getElementById('chatFab').classList.toggle('open', CHAT_OPEN);
   document.getElementById('chatFab').textContent = CHAT_OPEN ? '✕' : '💬';
-  if (CHAT_OPEN) setTimeout(() => document.getElementById('chatInput')?.focus(), 350);
+  if (CHAT_OPEN) {
+    setTimeout(() => document.getElementById('chatInput')?.focus(), 350);
+    const warn = document.getElementById('chatKeyWarning');
+    if (warn) warn.style.display = localStorage.getItem('hd_groq_key') ? 'none' : 'block';
+  }
 }
 
 function buildDataContext() {
@@ -2675,20 +2748,25 @@ My question: ${m.content}`
         : m.content
     }));
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const groqKey = localStorage.getItem('hd_groq_key') || '';
+    if (!groqKey) throw new Error('NO_KEY');
+
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + groqKey
+      },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'llama-3.3-70b-versatile',
         max_tokens: 1000,
-        system: CHAT_SYSTEM,
-        messages
+        messages: [{ role: 'system', content: CHAT_SYSTEM }, ...messages]
       })
     });
 
     const data = await response.json();
-    if (data.error) throw new Error(data.error.message);
-    const fullText = data.content?.find(b=>b.type==='text')?.text || 'No response.';
+    if (data.error) throw new Error(data.error.message || data.error.code || 'API error');
+    const fullText = data.choices?.[0]?.message?.content || 'No response.';
 
     // Parse suggestions out
     const suggMatch = fullText.match(/SUGGESTIONS:\s*([\s\S]+)$/i);
@@ -2723,11 +2801,19 @@ My question: ${m.content}`
 
   } catch(err) {
     typingEl.remove();
-    // Fallback to local answer if API unavailable
-    const fallback = generateLocalChatAnswer(text);
-    CHAT_HISTORY.push({ role: 'assistant', content: fallback });
-    const bubbleEl = appendChatBubble('ai', '');
-    await streamChatText(bubbleEl, fallback);
+    if (err.message === 'NO_KEY') {
+      const bubbleEl = appendChatBubble('ai', '');
+      bubbleEl.innerHTML = '<p>To use the AI chat, add your free Groq API key in <strong>Upload → AI Chat Settings</strong>. Get one free at <a href="https://console.groq.com" target="_blank" style="color:var(--accent)">console.groq.com</a> — no credit card needed.</p>';
+    } else if (err.message.includes('401') || err.message.includes('invalid_api_key') || err.message.includes('Authentication')) {
+      const bubbleEl = appendChatBubble('ai', '');
+      bubbleEl.innerHTML = '<p>Invalid API key. Please update it in <strong>Upload → AI Chat Settings</strong>.</p>';
+    } else {
+      // Fallback to local answer
+      const fallback = generateLocalChatAnswer(text);
+      CHAT_HISTORY.push({ role: 'assistant', content: fallback });
+      const bubbleEl = appendChatBubble('ai', '');
+      await streamChatText(bubbleEl, fallback);
+    }
   }
 
   CHAT_GENERATING = false;
@@ -2836,6 +2922,7 @@ if (_mc) _mc.content = savedTheme === 'dark' ? '#0d0f12' : '#f4f6f9';
 (async () => {
   await loadState();
   updateSBPanelUI();
+  updateGroqKeyUI();
   updateDateRange();
   renderOverview();
   setTimeout(addExpandButtons, 100);
