@@ -193,6 +193,7 @@ main{flex:1;padding:20px 0 40px}
   }
 }
 @media(min-width:769px){
+  #refreshBtn .refresh-icon::after{content:" Refresh";margin-left:4px;font-size:13px}
   .swipe-clip{display:contents}
   .view-track{ display:contents }
   .view-track .view{ display:none }
@@ -250,7 +251,8 @@ main{flex:1;padding:20px 0 40px}
   /* Metric grid: 2 cols on mobile */
   .metric-row{grid-template-columns:repeat(2,1fr)}
   /* Header: stack logo + controls */
-  header{flex-direction:row;align-items:center;flex-wrap:wrap;gap:8px;padding:12px 0 10px}
+  header{flex-direction:row;align-items:center;flex-wrap:nowrap;gap:8px;padding:12px 0 10px}
+  #headerActions{display:flex;margin-left:auto}
   .date-range{font-size:10px;padding:3px 8px}
   /* Timeframe buttons: scrollable row */
   .tf-btns{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
@@ -345,7 +347,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
 .drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:298;backdrop-filter:blur(2px)}
 .drawer-overlay.open{display:block}
 .drawer{
-  position:fixed;top:0;left:0;bottom:0;width:280px;z-index:299;
+  position:fixed;top:0;left:0;bottom:0;width:min(280px,85vw);z-index:299;
   background:var(--bg2);border-right:1px solid var(--border2);
   display:flex;flex-direction:column;
   transform:translateX(-100%);
@@ -374,7 +376,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
 .chat-expand-mini{background:none;border:1px solid var(--border2);color:var(--text3);width:28px;height:28px;border-radius:5px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s}
 .chat-expand-mini:hover{border-color:var(--accent);color:var(--accent)}
 @media(max-width:768px){
-  .hamburger{display:flex;align-items:center}
+  .hamburger{display:flex!important;align-items:center}
   /* Hide bottom nav (drawer replaces it) */
   .bottom-nav{display:none!important}
   /* Remove bottom padding added for bottom nav */
@@ -501,11 +503,14 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
       <button class="nav-btn" onclick="showView('insights')">Insights</button>
       <button class="nav-btn" onclick="showView('week')">Week</button>
       <div style="width:1px;height:20px;background:var(--border2);margin:0 4px;align-self:center"></div>
-      <button class="nav-btn" onclick="showView('ask')" style="border-color:var(--accent);color:var(--accent)">✦ Ask AI</button>
+      <button class="nav-btn" onclick="openAskView()" style="border-color:var(--accent);color:var(--accent)">✦ Ask AI</button>
       <button class="nav-btn" onclick="showView('upload')">Upload Data</button>
-      <button class="refresh-btn" id="refreshBtn" onclick="refreshAll()" title="Refresh all charts and data"><span class="refresh-icon">↺</span> Refresh</button>
-      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode">🌙</button>
     </nav>
+    <!-- Refresh + theme always visible on mobile header -->
+    <div style="display:flex;align-items:center;gap:6px" id="headerActions">
+      <button class="refresh-btn" id="refreshBtn" onclick="refreshAll()" title="Refresh all charts and data" style="padding:6px 10px"><span class="refresh-icon">↺</span></button>
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode">🌙</button>
+    </div>
   </header>
 
   <main>
@@ -2157,6 +2162,7 @@ document.addEventListener('touchstart', e => {
 
 document.addEventListener('touchmove', e => {
   if (!isMobile() || _touchStartX === 0) return;
+  if (_touchStartX < 30) return; // let drawer swipe handle left-edge touches
   const dx = e.touches[0].clientX - _touchStartX;
   const dy = e.touches[0].clientY - _touchStartY;
   if (!_dragging) {
@@ -2202,6 +2208,7 @@ function showView(id) {
   else if (id==='activity') renderActivity();
   else if (id==='insights') renderInsights();
   else if (id==='week') renderWeekDigest();
+  else if (id==='ask') { openAskView(); return; }
   else if (id==='upload') { renderUploadView(); setTimeout(initDragDrop, 50); }
   setTimeout(addExpandButtons, 50);
 }
