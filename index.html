@@ -2325,6 +2325,29 @@ function closeChartModalDirect() {
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeChartModalDirect(); });
 
+
+// ─── THEME TOGGLE ─────────────────────────────────────────────────────────────
+function toggleTheme() {
+  const root = document.documentElement;
+  const current = root.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  document.getElementById('themeToggle').textContent = next === 'dark' ? '🌙' : '☀️';
+  localStorage.setItem('hd_theme', next);
+  const mc = document.getElementById('themeColorMeta');
+  if (mc) mc.content = next === 'dark' ? '#0d0f12' : '#f4f6f9';
+  // Redraw active charts so colours update
+  const activeView = document.querySelector('.view.active');
+  if (activeView) {
+    const id = activeView.id.replace('view-','');
+    if (id==='overview')       renderOverview();
+    else if (id==='heartrate') renderHeartRate();
+    else if (id==='sleep')     renderSleep();
+    else if (id==='activity')  renderActivity();
+    else if (id==='insights')  renderInsights();
+  }
+}
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 const savedTheme = localStorage.getItem('hd_theme') || 'dark';
 document.documentElement.setAttribute('data-theme', savedTheme);
