@@ -340,6 +340,53 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
 .chart-modal-close:hover{border-color:var(--accent);color:var(--accent)}
 .chart-modal-body{position:relative;flex:1;min-height:500px}
 
+/* ── MOBILE DRAWER ───────────────────────────────────────────────────────── */
+.hamburger{display:none;background:none;border:none;color:var(--text2);font-size:22px;cursor:pointer;padding:4px 6px;line-height:1;-webkit-tap-highlight-color:transparent}
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:298;backdrop-filter:blur(2px)}
+.drawer-overlay.open{display:block}
+.drawer{
+  position:fixed;top:0;left:0;bottom:0;width:280px;z-index:299;
+  background:var(--bg2);border-right:1px solid var(--border2);
+  display:flex;flex-direction:column;
+  transform:translateX(-100%);
+  transition:transform .28s cubic-bezier(.4,0,.2,1);
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.drawer.open{transform:translateX(0)}
+.drawer-header{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 16px;padding-top:calc(20px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--border)}
+.drawer-close{background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:4px;line-height:1}
+.drawer-section-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;padding:14px 20px 6px}
+.drawer-item{
+  display:flex;align-items:center;gap:12px;
+  width:100%;padding:12px 20px;
+  background:none;border:none;cursor:pointer;
+  color:var(--text2);font-family:var(--font);font-size:14px;
+  text-align:left;transition:background .12s,color .12s;
+  -webkit-tap-highlight-color:transparent;
+}
+.drawer-item:hover,.drawer-item:active{background:var(--bg3);color:var(--text)}
+.drawer-item.active{color:var(--accent);background:rgba(79,209,197,0.08)}
+.drawer-item.active .drawer-icon{filter:none}
+.drawer-icon{font-size:18px;width:24px;text-align:center;flex-shrink:0}
+.drawer-divider{height:1px;background:var(--border);margin:8px 0}
+/* Chat expand mini button */
+.chat-expand-mini{background:none;border:1px solid var(--border2);color:var(--text3);width:28px;height:28px;border-radius:5px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.chat-expand-mini:hover{border-color:var(--accent);color:var(--accent)}
+@media(max-width:768px){
+  .hamburger{display:flex;align-items:center}
+  /* Hide bottom nav (drawer replaces it) */
+  .bottom-nav{display:none!important}
+  /* Remove bottom padding added for bottom nav */
+  main{padding-bottom:20px}
+  /* Hide floating chat fab on mobile - drawer has Ask AI */
+  .chat-fab{display:none!important}
+}
+@media(min-width:769px){
+  .drawer,.drawer-overlay,.hamburger{display:none!important}
+  /* Keep bottom nav hidden on desktop too (already hidden by default) */
+}
+
 /* ── FLOATING CHAT ───────────────────────────────────────────────────────── */
 .chat-fab{
   position:fixed;bottom:80px;right:18px;z-index:200;
@@ -441,6 +488,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
 <div class="app">
   <header>
     <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <button class="hamburger" id="hamburger" onclick="openDrawer()">☰</button>
       <div class="logo">Health<span>/</span>Dashboard</div>
       <span id="serverIndicator" style="font-family:var(--mono);font-size:10px;color:var(--text3);cursor:default" title="Checking…">● checking</span>
       <div class="date-range" id="globalDateRange">No data loaded</div>
@@ -882,29 +930,30 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
 </div>
 </main>
 
-<nav class="bottom-nav" id="bottomNav">
-  <button class="bottom-nav-btn active" onclick="showView('overview')" data-view="overview">
-    <span class="tab-icon">🏠</span>Overview
-  </button>
-  <button class="bottom-nav-btn" onclick="showView('heartrate')" data-view="heartrate">
-    <span class="tab-icon">❤️</span>Heart
-  </button>
-  <button class="bottom-nav-btn" onclick="showView('sleep')" data-view="sleep">
-    <span class="tab-icon">🛌</span>Sleep
-  </button>
-
-  <button class="bottom-nav-btn" onclick="showView('activity')" data-view="activity">
-    <span class="tab-icon">🏃</span>Activity
-  </button>
-  <button class="bottom-nav-btn" onclick="showView('insights')" data-view="insights">
-    <span class="tab-icon">💡</span>Insights
-  </button>
-  <button class="bottom-nav-btn" onclick="showView('week')" data-view="week">
-    <span class="tab-icon">📋</span>Week
-  </button>
-  <button class="bottom-nav-btn" onclick="showView('upload')" data-view="upload">
-    <span class="tab-icon">⬆️</span>Upload
-  </button>
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<nav class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div class="logo" style="font-size:14px">Health<span>/</span>Dashboard</div>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-section-label">Data</div>
+  <button class="drawer-item active" onclick="drawerNav('overview')" data-view="overview"><span class="drawer-icon">🏠</span>Overview</button>
+  <button class="drawer-item" onclick="drawerNav('heartrate')" data-view="heartrate"><span class="drawer-icon">❤️</span>Heart Rate</button>
+  <button class="drawer-item" onclick="drawerNav('sleep')" data-view="sleep"><span class="drawer-icon">🛌</span>Sleep</button>
+  <button class="drawer-item" onclick="drawerNav('activity')" data-view="activity"><span class="drawer-icon">🏃</span>Activity</button>
+  <button class="drawer-item" onclick="drawerNav('insights')" data-view="insights"><span class="drawer-icon">💡</span>Insights</button>
+  <button class="drawer-item" onclick="drawerNav('week')" data-view="week"><span class="drawer-icon">📋</span>Weekly Digest</button>
+  <div class="drawer-divider"></div>
+  <div class="drawer-section-label">Tools</div>
+  <button class="drawer-item" onclick="drawerNav('ask')" data-view="ask"><span class="drawer-icon">✦</span>Ask AI</button>
+  <button class="drawer-item" onclick="drawerNav('upload')" data-view="upload"><span class="drawer-icon">⬆️</span>Upload Data</button>
+  <div class="drawer-divider"></div>
+  <div style="padding:12px 20px">
+    <div class="drawer-section-label" style="margin-bottom:8px">Theme</div>
+    <button onclick="toggleTheme();closeDrawer()" style="background:none;border:1px solid var(--border2);color:var(--text2);padding:7px 16px;border-radius:8px;cursor:pointer;font-family:var(--font);font-size:13px;width:100%;text-align:left">
+      <span id="drawerThemeLabel">🌙 Dark mode</span>
+    </button>
+  </div>
 </nav>
 </div>
 
@@ -928,12 +977,12 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
 
 <div class="chat-panel" id="chatPanel">
   <div class="chat-header">
-    <div>
+    <div style="flex:1;min-width:0">
       <div class="chat-header-title"><span>✦</span> Ask your data</div>
       <div class="chat-header-sub">Answers from your actual numbers</div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <button onclick="openAskView()" title="Open full view" style="background:none;border:1px solid var(--border2);color:var(--text2);font-size:12px;padding:4px 10px;border-radius:5px;cursor:pointer;white-space:nowrap;font-family:var(--font)">⤢ Expand</button>
+    <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+      <button onclick="openAskView()" title="Full screen" class="chat-expand-mini">⤢</button>
       <button class="chat-close" onclick="toggleChat()">✕</button>
     </div>
   </div>
@@ -2142,7 +2191,7 @@ function showView(id) {
   document.querySelectorAll('.nav-btn').forEach(b=>{ if(b.textContent.toLowerCase().includes(id.slice(0,4))) b.classList.add('active'); });
   // Sync bottom nav
   document.querySelectorAll('.bottom-nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.view===id));
-  // No chat panel to sync anymore — chat is a full tab
+  document.querySelectorAll('.drawer-item').forEach(b=>b.classList.toggle('active', b.dataset.view===id));
   // Move swipe track
   const idx = VIEWS.indexOf(id);
   if (idx > -1) snapTo(idx, true);
@@ -2669,6 +2718,53 @@ document.addEventListener('keydown', e => {
     else closeChartModalDirect();
   }
 });
+
+
+// ─── MOBILE DRAWER ────────────────────────────────────────────────────────────
+function openDrawer() {
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  // Update theme label
+  const lbl = document.getElementById('drawerThemeLabel');
+  const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+  if (lbl) lbl.textContent = isDark ? '☀️ Light mode' : '🌙 Dark mode';
+}
+
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function drawerNav(id) {
+  closeDrawer();
+  if (id === 'ask') {
+    setTimeout(openAskView, 100);
+  } else {
+    showView(id);
+  }
+}
+
+// Swipe from left edge to open drawer (mobile)
+let _drawerSwipeStartX = 0;
+document.addEventListener('touchstart', e => {
+  if (window.innerWidth > 768) return;
+  _drawerSwipeStartX = e.touches[0].clientX;
+}, { passive: true });
+
+document.addEventListener('touchend', e => {
+  if (window.innerWidth > 768) return;
+  const dx = e.changedTouches[0].clientX - _drawerSwipeStartX;
+  const startedNearEdge = _drawerSwipeStartX < 24;
+  const drawerOpen = document.getElementById('drawer').classList.contains('open');
+  if (startedNearEdge && dx > 60) openDrawer();
+  if (drawerOpen && dx < -60) closeDrawer();
+}, { passive: true });
+
+// Sync drawer active state with showView
+const _origShowView = showView;
+// (patch inline — drawerNav calls showView which already syncs data-view buttons)
 
 // ─── GROQ KEY UI ──────────────────────────────────────────────────────────────
 function showGroqSetup() {
