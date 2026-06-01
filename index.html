@@ -484,6 +484,165 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
   .week-card-body{padding:14px 16px}
 }
 
+/* ── PAGE TITLES (mobile) ────────────────────────────────────────────────── */
+.page-title{display:none;font-size:20px;font-weight:300;color:var(--text);padding:4px 0 16px;border-bottom:1px solid var(--border);margin-bottom:20px}
+@media(max-width:768px){.page-title{display:block}}
+
+/* ── FLOATING CHAT PANEL + FAB ───────────────────────────────────────────── */
+.chat-fab{
+  position:fixed;bottom:24px;right:18px;z-index:200;
+  width:52px;height:52px;border-radius:50%;
+  background:var(--accent);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;box-shadow:0 4px 20px rgba(79,209,197,0.4);
+  transition:transform .2s,box-shadow .2s;-webkit-tap-highlight-color:transparent;
+}
+.chat-fab:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(79,209,197,0.55)}
+.chat-fab.open{background:var(--bg3);box-shadow:0 2px 12px rgba(0,0,0,0.3)}
+@media(max-width:768px){.chat-fab{display:none!important}}
+
+.chat-panel{
+  position:fixed;bottom:84px;right:24px;z-index:199;
+  width:380px;height:500px;
+  background:var(--bg2);border:1px solid var(--border2);
+  border-radius:16px;
+  display:flex;flex-direction:column;
+  transform:translateY(20px);opacity:0;pointer-events:none;
+  transition:transform .25s cubic-bezier(.4,0,.2,1),opacity .25s;
+  box-shadow:0 8px 40px rgba(0,0,0,0.3);
+  overflow:hidden;
+}
+.chat-panel.open{transform:translateY(0);opacity:1;pointer-events:all}
+
+.chat-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px 12px;border-bottom:1px solid var(--border);
+  flex-shrink:0;background:var(--bg2);
+}
+.chat-header-title{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:12px;color:var(--accent);
+  text-transform:uppercase;letter-spacing:.08em;font-weight:500;
+}
+.chat-header-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.chat-close{
+  background:none;border:none;color:var(--text3);font-size:18px;
+  cursor:pointer;padding:2px;line-height:1;border-radius:4px;transition:color .15s;
+}
+.chat-close:hover{color:var(--text)}
+.chat-expand-mini{
+  background:none;border:1px solid var(--border2);color:var(--text3);
+  width:26px;height:26px;border-radius:5px;cursor:pointer;font-size:13px;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.chat-expand-mini:hover{border-color:var(--accent);color:var(--accent)}
+
+.chat-messages{
+  flex:1;overflow-y:auto;padding:14px 14px 8px;
+  display:flex;flex-direction:column;gap:12px;
+  scroll-behavior:smooth;-webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+}
+.chat-msg{display:flex;flex-direction:column;gap:4px}
+.chat-msg-user{align-items:flex-end}
+.chat-msg-ai{align-items:flex-start}
+.chat-bubble{
+  padding:9px 13px;border-radius:14px;
+  font-size:13px;line-height:1.55;max-width:88%;
+}
+.chat-bubble-user{
+  background:var(--accent);color:#0d2e2b;
+  border-bottom-right-radius:4px;font-weight:500;
+}
+.chat-bubble-ai{
+  background:var(--bg3);color:var(--text);
+  border-bottom-left-radius:4px;border:1px solid var(--border);
+}
+.chat-bubble-ai p{margin-bottom:5px}
+.chat-bubble-ai p:last-child{margin-bottom:0}
+.chat-bubble-ai strong{color:var(--accent)}
+
+.chat-suggestions{display:flex;flex-direction:column;gap:5px;margin-top:5px}
+.chat-suggestion{
+  background:none;border:1px solid var(--border2);color:var(--text2);
+  font-family:var(--font);font-size:12px;padding:6px 11px;
+  border-radius:7px;cursor:pointer;text-align:left;transition:all .15s;line-height:1.4;
+}
+.chat-suggestion:hover{border-color:var(--accent);color:var(--accent);background:rgba(79,209,197,0.05)}
+
+.chat-input-wrap{
+  padding:10px 12px;border-top:1px solid var(--border);
+  display:flex;gap:8px;align-items:flex-end;flex-shrink:0;
+}
+.chat-input{
+  flex:1;background:var(--bg3);border:1px solid var(--border2);
+  color:var(--text);font-family:var(--font);font-size:13px;
+  padding:8px 11px;border-radius:10px;resize:none;outline:none;
+  line-height:1.4;max-height:100px;transition:border-color .15s;
+}
+.chat-input:focus{border-color:var(--accent)}
+.chat-input::placeholder{color:var(--text3)}
+.chat-send{
+  background:var(--accent);border:none;color:#0d2e2b;
+  width:34px;height:34px;border-radius:8px;cursor:pointer;
+  font-size:16px;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:opacity .15s;font-weight:700;align-self:flex-end;
+}
+.chat-send:disabled{opacity:.4;cursor:not-allowed}
+
+.chat-empty{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;padding:16px;gap:10px;
+}
+.chat-empty-icon{font-size:28px}
+.chat-empty-title{font-size:14px;font-weight:500;color:var(--text)}
+.chat-empty-sub{font-size:12px;color:var(--text3);line-height:1.6}
+.chat-starters{display:flex;flex-direction:column;gap:6px;width:100%;margin-top:4px}
+.chat-starter{
+  background:var(--bg3);border:1px solid var(--border);
+  color:var(--text2);font-size:12px;font-family:var(--font);
+  padding:8px 13px;border-radius:8px;cursor:pointer;
+  text-align:left;transition:all .15s;line-height:1.4;
+}
+.chat-starter:hover{border-color:var(--accent);color:var(--accent)}
+.chat-typing{display:flex;align-items:center;gap:3px;padding:3px 0}
+.chat-typing span{
+  width:5px;height:5px;border-radius:50%;background:var(--text3);
+  animation:typingDot 1.2s infinite;
+}
+.chat-typing span:nth-child(2){animation-delay:.2s}
+.chat-typing span:nth-child(3){animation-delay:.4s}
+@keyframes typingDot{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-4px);opacity:1}}
+.ai-cursor{display:inline-block;width:2px;height:1em;background:var(--accent);margin-left:2px;vertical-align:text-bottom;animation:blink-cur .7s step-end infinite}
+@keyframes blink-cur{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ── ASK AI FULL VIEW ────────────────────────────────────────────────────── */
+#view-ask{
+  background:var(--bg);
+  padding-top:env(safe-area-inset-top,0px);
+}
+#view-ask .ask-inner{
+  max-width:720px;margin:0 auto;
+  display:flex;flex-direction:column;
+  height:calc(100vh - env(safe-area-inset-top,0px));
+  padding:20px 20px 0;box-sizing:border-box;
+}
+#view-ask .ask-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-bottom:16px;border-bottom:1px solid var(--border);
+  margin-bottom:16px;flex-shrink:0;
+}
+#view-ask .ask-messages{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;padding-bottom:12px;
+  display:flex;flex-direction:column;gap:12px;
+}
+#view-ask .ask-input-row{
+  flex-shrink:0;padding:12px 0 calc(16px + env(safe-area-inset-bottom,0px));
+  border-top:1px solid var(--border);
+  display:flex;gap:8px;align-items:flex-end;
+}
+
 </style>
 </head>
 <body>
@@ -529,6 +688,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
         </div>
         <span class="tf-label" id="tf-label-overview"></span>
       </div>
+      <div class="page-title">🏠 Overview</div>
             <div class="overview-grid" id="ov-cards"></div>
       <div class="section">
         <div class="section-header"><span class="section-title">30-day trend</span><span class="section-sub">steps · resting HR · sleep duration</span></div>
@@ -556,6 +716,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
         </div>
         <span class="tf-label" id="tf-label-heartrate"></span>
       </div>
+      <div class="page-title">❤️ Heart Rate</div>
             <div class="metric-row" id="hr-metrics"></div>
       <div class="section">
         <div class="section-header"><span class="section-title">Daily mean & resting HR</span></div>
@@ -620,6 +781,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
         </div>
         <span class="tf-label" id="tf-label-sleep"></span>
       </div>
+      <div class="page-title">🛌 Sleep</div>
             <div class="metric-row" id="sleep-metrics"></div>
       <div class="section">
         <div class="section-header"><span class="section-title">Nightly sleep duration</span></div>
@@ -672,6 +834,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
         </div>
         <span class="tf-label" id="tf-label-activity"></span>
       </div>
+      <div class="page-title">🏃 Activity</div>
             <div class="metric-row" id="act-metrics"></div>
       <div class="section">
         <div class="section-header"><span class="section-title">Daily steps with 7-day rolling average</span></div>
@@ -724,6 +887,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
         </div>
         <span class="tf-label" id="tf-label-insights"></span>
       </div>
+      <div class="page-title">💡 Insights</div>
       
       <!-- SLEEP DEBT -->
       <div class="section">
@@ -802,6 +966,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
 
     </div>
 <div class="view" id="view-week">
+      <div class="page-title">📋 Weekly Digest</div>
       <div style="padding:4px 0 20px">
         <div style="font-size:22px;font-weight:300;color:var(--text);margin-bottom:4px">Weekly Digest</div>
         <div style="font-size:13px;color:var(--text3)">Your week in numbers — auto-generated from your data</div>
@@ -811,6 +976,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
 
     <!-- ASK AI TAB -->
     <div class="view" id="view-upload">
+      <div class="page-title">⬆️ Upload Data</div>
       <!-- CLOUD SYNC CONFIG -->
       <div class="sb-panel" id="sbPanel">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:4px">
@@ -901,35 +1067,33 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
   </div><!-- /swipe-clip -->
   
 <!-- ASK AI FULL VIEW (overlay, not in swipe track) -->
-<div id="view-ask" style="display:none;position:fixed;inset:0;z-index:190;background:var(--bg);overflow-y:auto;padding:20px 20px calc(80px + env(safe-area-inset-bottom,0px))">
-  <div style="max-width:1400px;margin:0 auto">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)">
+<div id="view-ask" style="display:none;position:fixed;inset:0;z-index:190;">
+  <div class="ask-inner">
+    <div class="ask-header">
       <div>
-        <div style="font-size:18px;font-weight:500;color:var(--text)">✦ Ask your data</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:2px">Powered by Groq · answers from your actual numbers only</div>
+        <div style="font-size:18px;font-weight:500;color:var(--text);display:flex;align-items:center;gap:8px"><span style="color:var(--accent)">✦</span> Ask your data</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:3px">Powered by Groq · answers from your actual numbers only</div>
       </div>
-      <button onclick="closeAskView()" style="background:none;border:1px solid var(--border2);color:var(--text2);padding:6px 14px;border-radius:6px;cursor:pointer;font-family:var(--font);font-size:13px">← Back</button>
+      <button onclick="closeAskView()" style="background:none;border:1px solid var(--border2);color:var(--text2);padding:7px 16px;border-radius:8px;cursor:pointer;font-family:var(--font);font-size:13px;white-space:nowrap;flex-shrink:0">← Back</button>
     </div>
-    <div style="display:flex;flex-direction:column;gap:0;max-width:720px;margin:0 auto">
-      <div class="chat-messages" id="chatMessagesExpanded" style="min-height:400px;max-height:60vh;overflow-y:auto;overscroll-behavior:contain;padding:0 0 16px;-webkit-overflow-scrolling:touch">
-        <div class="chat-empty" id="chatEmptyExpanded">
-          <div class="chat-empty-icon">🔍</div>
-          <div class="chat-empty-title">Ask anything about your health data</div>
-          <div class="chat-empty-sub">Questions answered using only your actual numbers.</div>
-          <div class="chat-starters">
-            <button class="chat-starter" onclick="sendExpandedChatMessage('When do I sleep best?')">When do I sleep best?</button>
-            <button class="chat-starter" onclick="sendExpandedChatMessage('Is my fitness improving?')">Is my fitness improving?</button>
-            <button class="chat-starter" onclick="sendExpandedChatMessage('What were my most active days?')">What were my most active days?</button>
-            <button class="chat-starter" onclick="sendExpandedChatMessage('How does my training affect my sleep?')">How does my training affect my sleep?</button>
-          </div>
+    <div class="ask-messages chat-messages" id="chatMessagesExpanded">
+      <div class="chat-empty" id="chatEmptyExpanded">
+        <div class="chat-empty-icon">🔍</div>
+        <div class="chat-empty-title">Ask anything about your health data</div>
+        <div class="chat-empty-sub">Questions answered using only your actual numbers.</div>
+        <div class="chat-starters">
+          <button class="chat-starter" onclick="sendExpandedChatMessage('When do I sleep best?')">When do I sleep best?</button>
+          <button class="chat-starter" onclick="sendExpandedChatMessage('Is my fitness improving?')">Is my fitness improving?</button>
+          <button class="chat-starter" onclick="sendExpandedChatMessage('What were my most active days?')">What were my most active days?</button>
+          <button class="chat-starter" onclick="sendExpandedChatMessage('How does my training affect my sleep?')">How does my training affect my sleep?</button>
         </div>
       </div>
-      <div style="border-top:1px solid var(--border);padding-top:12px;display:flex;gap:8px;align-items:flex-end">
-        <textarea class="chat-input" id="chatInputExpanded" placeholder="Ask about your data…" rows="1"
-          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendExpandedFromInput()}"
-          oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
-        <button class="chat-send" id="chatSendExpanded" onclick="sendExpandedFromInput()">↑</button>
-      </div>
+    </div>
+    <div class="ask-input-row">
+      <textarea class="chat-input" id="chatInputExpanded" placeholder="Ask about your data…" rows="1"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendExpandedFromInput()}"
+        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+      <button class="chat-send" id="chatSendExpanded" onclick="sendExpandedFromInput()">↑</button>
     </div>
   </div>
 </div>
