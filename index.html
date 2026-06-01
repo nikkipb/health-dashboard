@@ -1363,6 +1363,82 @@ const FILE_CONFIGS = [
   { key:'ast', label:'Activity Stage', file:'ACTIVITY_STAGE', desc:'Columns: date, start, stop, distance, calories, steps', stateKey:'ast_daily', process: processActivityStage },
 ];
 
+
+// ─── SUPABASE CONFIG UI ───────────────────────────────────────────────────────
+function updateSBPanelUI() {
+  const panel = document.getElementById('sbPanel');
+  const statusLine = document.getElementById('sbStatusLine');
+  const actions = document.getElementById('sbActions');
+  if (!panel) return;
+  if (SB) {
+    panel.className = 'sb-panel sb-connected';
+    if (statusLine) statusLine.innerHTML = `<span style="color:var(--green)">✓ Connected</span> — ${SB.url.replace('https://','').split('.')[0]}.supabase.co &nbsp;·&nbsp; data syncs across all devices`;
+    if (actions) actions.innerHTML = `<button class="sb-btn sb-btn-secondary" onclick="showSBSetup()">Edit</button><button class="sb-btn sb-btn-secondary" style="color:var(--accent4);border-color:var(--accent4)" onclick="disconnectSB()">Disconnect</button>`;
+  } else {
+    panel.className = 'sb-panel';
+    if (statusLine) statusLine.textContent = 'Not configured — data is stored locally in this browser only.';
+    if (actions) actions.innerHTML = `<button class="sb-btn sb-btn-secondary" onclick="showSBSetup()">Configure</button>`;
+  }
+}
+
+function showSBSetup() {
+  const form = document.getElementById('sbSetupForm');
+  if (form) form.style.display = 'block';
+  if (SB) {
+    const u = document.getElementById('sbUrl');
+    const k = document.getElementById('sbKey');
+    if (u) u.value = SB.url || '';
+    if (k) k.value = SB.key || '';
+  }
+}
+
+function hideSBSetup() {
+  const form = document.getElementById('sbSetupForm');
+  if (form) form.style.display = 'none';
+}
+
+async function saveSBConfig() {
+  const url = (document.getElementById('sbUrl')?.value||'').trim().replace(/\/+$/, '');
+  const key = (document.getElementById('sbKey')?.value||'').trim();
+  const statusEl = document.getElementById('sbFormStatus');
+  if (!url || !key) { statusEl.textContent = '✗ Both fields required'; statusEl.style.color='var(--red)'; return; }
+  if (!url.includes('supabase.co')) { statusEl.textContent = '✗ URL should be your-project.supabase.co'; statusEl.style.color='var(--red)'; return; }
+  statusEl.textContent = 'Connecting…'; statusEl.style.color='var(--accent3)';
+  setSBConfig({ url, key });
+  try {
+    const r = await fetch(`${url}/rest/v1/health_data`, {
+      method: 'POST',
+      headers: { 'apikey': key, 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
+      body: JSON.stringify({ id: 1, payload: STATE }),
+      signal: AbortSignal.timeout(10000)
+    });
+    if (!r.ok && r.status !== 201) {
+      const errText = await r.text().catch(()=>'');
+      clearSBConfig();
+      statusEl.textContent = `✗ Error ${r.status}: ${errText.slice(0,120)||'check URL and key'}`;
+      statusEl.style.color = 'var(--red)'; return;
+    }
+  } catch(e) {
+    clearSBConfig();
+    statusEl.textContent = `✗ Network error: ${e.message}`;
+    statusEl.style.color = 'var(--red)'; return;
+  }
+  statusEl.textContent = '✓ Connected! Loading data…'; statusEl.style.color='var(--green)';
+  await loadState();
+  hideSBSetup();
+  updateSBPanelUI();
+  renderUploadView();
+  showToast('Cloud sync enabled — data syncing across devices');
+}
+
+function disconnectSB() {
+  if (!confirm('Disconnect cloud sync? Your data will remain in Supabase but this browser will switch to local storage.')) return;
+  clearSBConfig();
+  updateSyncIndicator('local');
+  updateSBPanelUI();
+  showToast('Cloud sync disconnected');
+}
+
 function renderUploadView() {
   updateSBPanelUI();
   const grid = document.getElementById('upload-grid');
