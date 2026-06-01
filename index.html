@@ -302,7 +302,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
 .tf-btn{background:none;border:1px solid var(--border);color:var(--text3);font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:5px;cursor:pointer;transition:all .15s}
 .tf-btn:hover{border-color:var(--border2);color:var(--text2)}
 .tf-btn.active{background:var(--bg3);border-color:var(--accent);color:var(--accent)}
-.tf-label{font-family:var(--mono);font-size:11px;color:var(--text3)}
+.tf-label{font-family:var(--mono);font-size:11px;color:var(--text3);background:var(--bg3);padding:3px 8px;border-radius:5px;border:1px solid var(--border)}
 /* REFRESH BUTTON */
 .refresh-btn{display:flex;align-items:center;gap:6px;background:none;border:1px solid var(--border2);color:var(--text2);font-family:var(--font);font-size:13px;padding:7px 14px;border-radius:6px;cursor:pointer;transition:all .2s}
 .refresh-btn:hover{border-color:var(--accent);color:var(--accent)}
@@ -380,11 +380,12 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
         <span class="tf-label" id="tf-label-overview"></span>
       </div>
       <div class="ai-panel">
-        <div class="ai-panel-header">
+        <div class="ai-panel-header" onclick="toggleAIPanel('overview')" style="cursor:pointer">
           <div class="ai-panel-title"><div class="ai-dot"></div>AI Analysis</div>
           <div style="display:flex;align-items:center;gap:8px">
-            <button class="ai-inner-refresh" id="ai-inner-overview" onclick="refreshAI('overview')" title="Generate fresh analysis">↺</button>
-            <button class="ai-refresh" id="ai-btn-overview" onclick="generateAI('overview')">Generate ↗</button>
+            <button class="ai-inner-refresh" id="ai-inner-overview" onclick="event.stopPropagation();refreshAI('overview')" title="Generate fresh analysis">↺</button>
+            <button class="ai-refresh" id="ai-btn-overview" onclick="event.stopPropagation();generateAI('overview')">Generate ↗</button>
+            <span id="ai-chevron-overview" style="color:var(--text3);font-size:12px;transition:transform .2s;display:inline-block">▾</span>
           </div>
         </div>
         <div class="ai-body" id="ai-body-overview"><span style="color:var(--text3);font-size:12px">Click Generate for an AI summary of your overall health data.</span></div>
@@ -417,11 +418,12 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
         <span class="tf-label" id="tf-label-heartrate"></span>
       </div>
       <div class="ai-panel">
-        <div class="ai-panel-header">
+        <div class="ai-panel-header" onclick="toggleAIPanel('heartrate')" style="cursor:pointer">
           <div class="ai-panel-title"><div class="ai-dot"></div>AI Analysis — Heart Rate</div>
           <div style="display:flex;align-items:center;gap:8px">
-            <button class="ai-inner-refresh" id="ai-inner-heartrate" onclick="refreshAI('heartrate')" title="Generate fresh analysis">↺</button>
-            <button class="ai-refresh" id="ai-btn-heartrate" onclick="generateAI('heartrate')">Generate ↗</button>
+            <button class="ai-inner-refresh" id="ai-inner-heartrate" onclick="event.stopPropagation();refreshAI('heartrate')" title="Generate fresh analysis">↺</button>
+            <button class="ai-refresh" id="ai-btn-heartrate" onclick="event.stopPropagation();generateAI('heartrate')">Generate ↗</button>
+            <span id="ai-chevron-heartrate" style="color:var(--text3);font-size:12px;transition:transform .2s;display:inline-block">▾</span>
           </div>
         </div>
         <div class="ai-body" id="ai-body-heartrate"><span style="color:var(--text3);font-size:12px">Click Generate for AI commentary on your heart rate patterns.</span></div>
@@ -491,11 +493,12 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
         <span class="tf-label" id="tf-label-sleep"></span>
       </div>
       <div class="ai-panel">
-        <div class="ai-panel-header">
+        <div class="ai-panel-header" onclick="toggleAIPanel('sleep')" style="cursor:pointer">
           <div class="ai-panel-title"><div class="ai-dot"></div>AI Analysis — Sleep</div>
           <div style="display:flex;align-items:center;gap:8px">
-            <button class="ai-inner-refresh" id="ai-inner-sleep" onclick="refreshAI('sleep')" title="Generate fresh analysis">↺</button>
-            <button class="ai-refresh" id="ai-btn-sleep" onclick="generateAI('sleep')">Generate ↗</button>
+            <button class="ai-inner-refresh" id="ai-inner-sleep" onclick="event.stopPropagation();refreshAI('sleep')" title="Generate fresh analysis">↺</button>
+            <button class="ai-refresh" id="ai-btn-sleep" onclick="event.stopPropagation();generateAI('sleep')">Generate ↗</button>
+            <span id="ai-chevron-sleep" style="color:var(--text3);font-size:12px;transition:transform .2s;display:inline-block">▾</span>
           </div>
         </div>
         <div class="ai-body" id="ai-body-sleep"><span style="color:var(--text3);font-size:12px">Click Generate for AI commentary on your sleep quality and patterns.</span></div>
@@ -553,11 +556,12 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
         <span class="tf-label" id="tf-label-activity"></span>
       </div>
       <div class="ai-panel">
-        <div class="ai-panel-header">
+        <div class="ai-panel-header" onclick="toggleAIPanel('activity')" style="cursor:pointer">
           <div class="ai-panel-title"><div class="ai-dot"></div>AI Analysis — Activity</div>
           <div style="display:flex;align-items:center;gap:8px">
-            <button class="ai-inner-refresh" id="ai-inner-activity" onclick="refreshAI('activity')" title="Generate fresh analysis">↺</button>
-            <button class="ai-refresh" id="ai-btn-activity" onclick="generateAI('activity')">Generate ↗</button>
+            <button class="ai-inner-refresh" id="ai-inner-activity" onclick="event.stopPropagation();refreshAI('activity')" title="Generate fresh analysis">↺</button>
+            <button class="ai-refresh" id="ai-btn-activity" onclick="event.stopPropagation();generateAI('activity')">Generate ↗</button>
+            <span id="ai-chevron-activity" style="color:var(--text3);font-size:12px;transition:transform .2s;display:inline-block">▾</span>
           </div>
         </div>
         <div class="ai-body" id="ai-body-activity"><span style="color:var(--text3);font-size:12px">Click Generate for AI commentary on your activity and movement patterns.</span></div>
@@ -615,11 +619,12 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
         <span class="tf-label" id="tf-label-insights"></span>
       </div>
       <div class="ai-panel">
-        <div class="ai-panel-header">
+        <div class="ai-panel-header" onclick="toggleAIPanel('insights')" style="cursor:pointer">
           <div class="ai-panel-title"><div class="ai-dot"></div>AI Analysis — Insights</div>
           <div style="display:flex;align-items:center;gap:8px">
-            <button class="ai-inner-refresh" id="ai-inner-insights" onclick="refreshAI('insights')" title="Generate fresh analysis">↺</button>
-            <button class="ai-refresh" id="ai-btn-insights" onclick="generateAI('insights')">Generate ↗</button>
+            <button class="ai-inner-refresh" id="ai-inner-insights" onclick="event.stopPropagation();refreshAI('insights')" title="Generate fresh analysis">↺</button>
+            <button class="ai-refresh" id="ai-btn-insights" onclick="event.stopPropagation();generateAI('insights')">Generate ↗</button>
+            <span id="ai-chevron-insights" style="color:var(--text3);font-size:12px;transition:transform .2s;display:inline-block">▾</span>
           </div>
         </div>
         <div class="ai-body" id="ai-body-insights"><span style="color:var(--text3);font-size:12px">Click Generate for AI commentary on your cross-dataset patterns.</span></div>
@@ -1559,146 +1564,59 @@ async function clearAllData() {
 }
 
 // ─── AI COMMENTARY ────────────────────────────────────────────────────────────
-const AI_CACHE = {};
-
-function buildPrompt(tab) {
-  const hr = STATE.hr_daily || [];
-  const sl = (STATE.sleep||[]).filter(s=>s.total_min>=120);
-  const am = STATE.am_daily || [];
-  const ast = STATE.ast_daily || [];
-
-  const dateRange = hr.length ? `${hr[0].date} to ${hr[hr.length-1].date}` : 'unknown';
-  const avgRestHR = hr.length ? Math.round(avg(hr.map(r=>r.resting))) : null;
-  const avgMeanHR = hr.length ? Math.round(avg(hr.map(r=>r.mean))) : null;
-  const anomalyDays = hr.filter(r=>r.max>160).map(r=>r.date);
-  const avgSleepHrs = sl.length ? avg(sl.map(s=>s.total_min/60)).toFixed(1) : null;
-  const avgDeep = sl.length ? Math.round(avg(sl.map(s=>s.deep))) : null;
-  const avgRem = sl.length ? Math.round(avg(sl.map(s=>s.rem))) : null;
-  const avgEff = sl.length ? avg(sl.map(s=>s.efficiency)).toFixed(1) : null;
-  const amSorted = [...am].sort((a,b)=>a.date.localeCompare(b.date));
-  const rolling7 = amSorted.map((r,i)=>{ const w=amSorted.slice(Math.max(0,i-6),i+1); return Math.round(avg(w.map(x=>x.steps))); });
-  const latestRoll = rolling7[rolling7.length-1]||0;
-  const avgSteps = am.length ? Math.round(avg(am.map(r=>r.steps))) : null;
-  const totalDist = ast.reduce((a,b)=>a+(b.dist_km||0),0).toFixed(1);
-  const totalCals = ast.reduce((a,b)=>a+(b.cals||0),0);
-  const zones = STATE.hr_zones||{};
-  const zTotal = (zones.z12||0)+(zones.z3||0)+(zones.z4||0)+(zones.z5||0);
-  const z5pct = zTotal ? ((zones.z5||0)/zTotal*100).toFixed(1) : 0;
-  const z4pct = zTotal ? ((zones.z4||0)/zTotal*100).toFixed(1) : 0;
-
-  const context = `
-User health data summary (date range: ${dateRange}):
-- Heart rate: avg resting ${avgRestHR} bpm, avg daily mean ${avgMeanHR} bpm, ${anomalyDays.length} days with HR peak >160 bpm (${anomalyDays.join(', ')})
-- HR zones: ${z5pct}% max effort (155+ bpm), ${z4pct}% hard (130-154 bpm)
-- Sleep: avg ${avgSleepHrs} hrs/night, avg deep ${avgDeep} min, avg REM ${avgRem} min, avg efficiency ${avgEff}%
-- Steps: avg ${avgSteps}/day, latest 7-day rolling avg ${latestRoll}, total distance ${totalDist} km
-- Active calories: ${totalCals} kcal total from recorded sessions
-`;
-
-  const prompts = {
-    overview: `${context}\nYou are a concise, knowledgeable health coach. Write 3-4 short paragraphs giving an overall picture of this person's health across the period. Highlight what's going well, any patterns worth noting, and 1-2 specific observations. Be direct, data-driven, and conversational. Do not use bullet points. Do not give medical advice. Format response as plain text with paragraph breaks.`,
-    heartrate: `${context}\nYou are a concise, knowledgeable health coach. Write 3-4 short paragraphs specifically about the heart rate data. Cover: resting HR quality, what the anomaly days suggest, the hourly pattern, and zone distribution. Be specific about the numbers. Be direct and conversational. Do not use bullet points. Do not give medical advice. Format as plain text with paragraph breaks.`,
-    sleep: `${context}\nYou are a concise, knowledgeable health coach. Write 3-4 short paragraphs specifically about the sleep data. Cover: overall sleep duration adequacy, deep sleep and REM quality, efficiency, and any patterns in sleep HR. Reference specific numbers. Be direct and conversational. Do not use bullet points. Do not give medical advice. Format as plain text with paragraph breaks.`,
-    activity: `${context}\nYou are a concise, knowledgeable health coach. Write 3-4 short paragraphs specifically about the activity data. Cover: step count trends, the clear upward trajectory in the rolling average, distance and calorie patterns, and what the hourly distribution suggests about lifestyle. Reference specific numbers. Be direct and conversational. Do not use bullet points. Do not give medical advice. Format as plain text with paragraph breaks.`,
-    insights: `${context}\nYou are a concise, knowledgeable health coach. Write 3-4 short paragraphs on what the cross-dataset analysis reveals. Cover: what the sleep debt balance says about recovery habits, how consistent the circadian rhythm is, what the sleep-to-next-day-steps pattern suggests, and what the resting HR trend implies about cardiovascular fitness direction. Be specific, data-driven, and conversational. No bullet points. No medical advice. Plain text with paragraph breaks.`,
-  };
-  return prompts[tab] || prompts.overview;
+// ─── AI COLLAPSE ──────────────────────────────────────────────────────────────
+const AI_COLLAPSED = {};
+function toggleAIPanel(tab) {
+  AI_COLLAPSED[tab] = !AI_COLLAPSED[tab];
+  const body = document.getElementById('ai-body-' + tab);
+  const chev = document.getElementById('ai-chevron-' + tab);
+  if (body) body.style.display = AI_COLLAPSED[tab] ? 'none' : '';
+  if (chev) chev.style.transform = AI_COLLAPSED[tab] ? 'rotate(-90deg)' : '';
 }
 
+// ─── AI GENERATION ────────────────────────────────────────────────────────────
+const AI_CACHE = {};
+const AI_LAST_IDX = {}; // track last pool index per tab to avoid repeats
+
 function generateAI(tab) {
-  const bodyEl = document.getElementById('ai-body-'+tab);
-  const btnEl = document.getElementById('ai-btn-'+tab);
+  const bodyEl = document.getElementById('ai-body-' + tab);
+  const btnEl  = document.getElementById('ai-btn-' + tab);
   if (!bodyEl) return;
+  // Expand if collapsed
+  if (AI_COLLAPSED[tab]) toggleAIPanel(tab);
+  bodyEl.style.display = '';
   bodyEl.innerHTML = `<div class="ai-loading">Analysing data<div class="ai-loading-dots"><span>.</span><span>.</span><span>.</span></div></div>`;
   btnEl.disabled = true; btnEl.textContent = 'Generating…';
   setTimeout(() => {
     const html = generateLocalAI(tab);
     streamText(bodyEl, html, () => {
-      AI_CACHE[tab] = bodyEl.innerHTML;
+      AI_CACHE[tab] = bodyEl.innerHTML.replace(/<span class="ai-cursor"><\/span>/g,'');
       btnEl.disabled = false;
       btnEl.textContent = 'Refresh ↗';
     });
   }, 80);
 }
 
-function streamText(el, html, onDone) {
-  // Parse paragraphs from html string, stream word by word
-  const div = document.createElement('div');
-  div.innerHTML = html;
-  const paragraphs = Array.from(div.querySelectorAll('p')).map(p => p.innerHTML);
-  el.innerHTML = '';
-
-  let pIdx = 0, wordIdx = 0, words = [];
-  const DELAY = 18; // ms per word — feels like ~60 wpm, natural LLM pace
-
-  function nextPara() {
-    if (pIdx >= paragraphs.length) { if (onDone) onDone(); return; }
-    // Split paragraph into tokens (words + html tags preserved)
-    words = tokenise(paragraphs[pIdx]);
-    wordIdx = 0;
-    const pEl = document.createElement('p');
-    el.appendChild(pEl);
-    ensureCursor(pEl);
-    nextWord(pEl);
-  }
-
-  let cursor = null;
-  function ensureCursor(pEl) {
-    if (cursor && cursor.parentNode) cursor.parentNode.removeChild(cursor);
-    cursor = document.createElement('span');
-    cursor.className = 'ai-cursor';
-    pEl.appendChild(cursor);
-  }
-  function removeCursor() {
-    if (cursor && cursor.parentNode) cursor.parentNode.removeChild(cursor);
-    cursor = null;
-  }
-
-  function nextWord(pEl) {
-    if (wordIdx >= words.length) {
-      removeCursor();
-      pIdx++;
-      setTimeout(nextPara, 120);
-      return;
-    }
-    const token = words[wordIdx++];
-    // Insert before cursor if present, else append
-    if (cursor && cursor.parentNode === pEl) {
-      pEl.insertBefore(document.createTextNode(''), cursor);
-      cursor.insertAdjacentHTML('beforebegin', token);
-    } else {
-      pEl.innerHTML += token;
-    }
-    ensureCursor(pEl);
-    setTimeout(() => nextWord(pEl), token.startsWith('<') ? 0 : DELAY);
-  }
-
-  nextPara();
+function refreshAI(tab) {
+  // Force different variant by invalidating cache
+  delete AI_CACHE[tab];
+  const btn = document.getElementById('ai-inner-' + tab);
+  if (btn) btn.classList.add('spinning');
+  generateAI(tab);
+  setTimeout(() => { if (btn) btn.classList.remove('spinning'); }, 800);
 }
 
-function tokenise(html) {
-  // Split into words and html tags, preserving structure
-  const tokens = [];
-  const re = /(<[^>]+>)|([^<\s]+)|\s+/g;
-  let m;
-  while ((m = re.exec(html)) !== null) {
-    if (m[1]) tokens.push(m[1]); // html tag — emit instantly
-    else if (m[2]) tokens.push(m[2] + ' '); // word — stream with delay
-    // whitespace between words already added above
-  }
-  return tokens;
-}
-
+// ─── AI COMMENTARY GENERATION ────────────────────────────────────────────────
 function generateLocalAI(tab) {
-  const hr  = STATE.hr_daily || [];
-  const sl  = (STATE.sleep||[]).filter(s=>s.total_min>=120);
-  const am  = STATE.am_daily || [];
-  const ast = STATE.ast_daily || [];
+  // Use timeframe-filtered data for the current view
+  const hr  = filterByTF(STATE.hr_daily||[], tab==='insights'?'insights':tab==='heartrate'?'heartrate':'overview');
+  const sl  = filterByTF(STATE.sleep||[], tab==='sleep'||tab==='insights'?tab:'overview').filter(s=>s.total_min>=120);
+  const am  = filterByTF(STATE.am_daily||[], tab==='activity'||tab==='insights'?tab:'overview');
+  const ast = filterByTF(STATE.ast_daily||[], tab==='activity'||tab==='insights'?tab:'overview');
 
   const avgRestHR    = hr.length ? Math.round(avg(hr.map(r=>r.resting))) : null;
   const avgMeanHR    = hr.length ? Math.round(avg(hr.map(r=>r.mean))) : null;
-  const anomalyDays  = hr.filter(r=>r.max>160);
-  const anomalyCount = anomalyDays.length;
+  const anomalyCount = hr.filter(r=>r.max>160).length;
   const maxHR        = hr.length ? Math.max(...hr.map(r=>r.max)) : null;
   const minRestHR    = hr.length ? Math.min(...hr.map(r=>r.resting)) : null;
   const avgSleepHrs  = sl.length ? +avg(sl.map(s=>s.total_min/60)).toFixed(1) : null;
@@ -1717,533 +1635,104 @@ function generateLocalAI(tab) {
   const totalCals    = ast.reduce((a,b)=>a+(b.cals||0),0);
   const lowSleepN    = sl.filter(s=>s.total_min/60<6).length;
   const highSleepN   = sl.filter(s=>s.total_min/60>9).length;
-  const worstSleep   = sl.length ? sl.reduce((a,b)=>a.deep<b.deep?a:b) : null;
   const bestSleep    = sl.length ? sl.reduce((a,b)=>a.deep>b.deep?a:b) : null;
   const avgWake      = sl.length ? Math.round(avg(sl.map(s=>s.wake))) : null;
   const highCalDays  = ast.filter(r=>r.cals>400);
   const daysAbove10k = am.filter(r=>r.steps>=10000).length;
   const hrSorted     = [...hr].sort((a,b)=>a.date.localeCompare(b.date));
-  const rhrTrend     = hrSorted.length > 6 ? hrSorted[hrSorted.length-1].resting - hrSorted[0].resting : 0;
+  const rhrTrend     = hrSorted.length > 3 ? hrSorted[hrSorted.length-1].resting - hrSorted[0].resting : 0;
+  const days         = hr.length || am.length || sl.length;
+  const tfDays       = TF[tab] || TF['overview'] || 0;
+  const tfLabel      = tfDays === -1 ? 'all available data' : tfDays === 0 ? 'the last 30 days' : `the last ${tfDays} day${tfDays===1?'':'s'}`;
 
-  // pick = random item from array
-  const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+  // Pick a random pool variant, avoiding last shown
+  function pickVariant(poolArr) {
+    const lastIdx = AI_LAST_IDX[tab] ?? -1;
+    let idx;
+    if (poolArr.length <= 1) { idx = 0; }
+    else {
+      do { idx = Math.floor(Math.random() * poolArr.length); } while (idx === lastIdx);
+    }
+    AI_LAST_IDX[tab] = idx;
+    return poolArr[idx];
+  }
 
   const pools = {
     overview: [
       [
-        `Your data spans <strong>${hr.length} days</strong> of continuous monitoring. The headline number is a resting HR of <strong>${avgRestHR} bpm</strong> — sitting comfortably in the aerobic-fitness range. That, combined with sleep efficiency of <strong>${avgEff}%</strong>, paints a strong recovery baseline.`,
-        `Activity trend is the standout story. Your 7-day rolling average went from <strong>${firstRoll.toLocaleString()}</strong> to <strong>${latestRoll.toLocaleString()}</strong> steps — a <strong>${rollMultiple}×</strong> increase across the period. The direction matters more than any single-day number, and the direction here is unambiguously upward.`,
-        `Sleep averaging <strong>${avgSleepHrs} hours</strong> with <strong>${avgDeep} min deep</strong> and <strong>${avgRem} min REM</strong> is above average across all three metrics. The ${lowSleepN} short nights (under 6h) are the only meaningful outlier — and they tend to cluster around the heaviest training days, which is a predictable pattern.`,
-        `The <strong>${anomalyCount} HR spike days</strong> are not a concern in isolation — daily means on those days were normal, indicating discrete hard efforts rather than sustained elevation. The key indicator to keep watching is resting HR trend: it's currently ${rhrTrend <= 0 ? 'flat to falling, which is a positive fitness signal' : 'slightly elevated, worth monitoring as load increases'}.`,
+        `Looking at ${tfLabel}, your resting HR is <strong>${avgRestHR??'—'} bpm</strong> — a healthy aerobic baseline. Sleep efficiency of <strong>${avgEff??'—'}%</strong> and deep sleep averaging <strong>${avgDeep??'—'} min</strong> per night means recovery quality is solid.`,
+        `Activity tells the clearest story: your 7-day rolling step average ${firstRoll !== latestRoll ? `climbed from <strong>${firstRoll.toLocaleString()}</strong> to <strong>${latestRoll.toLocaleString()}</strong>` : `is holding at <strong>${latestRoll.toLocaleString()}</strong>`} across this window. ${daysAbove10k > 0 ? `<strong>${daysAbove10k}</strong> days hit the 10k mark.` : 'The 10k daily goal is within reach most days.'}`,
+        `${anomalyCount > 0 ? `The <strong>${anomalyCount} HR spike day${anomalyCount>1?'s':''}</strong> (peak above 160 bpm) correspond to your hardest effort sessions — daily means on those days were normal, confirming discrete intensity rather than sustained elevation.` : 'No HR anomaly days in this window — either a recovery period or consistently measured effort.'}`,
+        `The numbers are pointing in the same direction: ${rhrTrend <= 0 ? 'resting HR trending down' : 'load increasing'}, sleep quality consistent, and activity volume rising. The key variable to watch is whether resting HR stays stable as training load grows.`
       ],
       [
-        `Across <strong>${hr.length} days</strong>, the data tells a consistent story of improving fitness load. Resting HR of <strong>${avgRestHR} bpm</strong> is a strong baseline, and the minimum recorded resting value of <strong>${minRestHR} bpm</strong> on your best recovery days shows what the ceiling looks like when conditions align.`,
-        `The step trajectory is the clearest signal in the dataset. Rolling 7-day average climbing from <strong>${firstRoll.toLocaleString()}</strong> to <strong>${latestRoll.toLocaleString()}</strong> over the period — a <strong>${rollMultiple}×</strong> increase — reflects a real behavioural shift, not just noise. ${daysAbove10k > 0 ? `You hit the 10,000-step mark on <strong>${daysAbove10k} days</strong>, with a peak of <strong>${maxSteps?.toLocaleString()}</strong> on ${maxStepsDay ? maxStepsDay.date : 'one standout day'}.` : ''}`,
-        `Sleep is a genuine recovery asset here. <strong>${avgEff}%</strong> efficiency means almost no time lying awake, and <strong>${avgDeep} min</strong> of deep sleep per night is at or above the threshold where physical repair and memory consolidation are happening properly.`,
-        `${highCalDays.length} training sessions burned over 400 active calories — these are the same dates flagged as HR anomaly days, confirming they were high-quality efforts rather than random spikes. The correlation between training intensity and next-day resting HR is the variable most worth tracking as load continues to rise.`,
-      ],
-      [
-        `The numbers across all four data streams are pointing in the same direction: increasing fitness load being absorbed without degradation in recovery metrics. Resting HR is <strong>${avgRestHR} bpm</strong>, sleep efficiency <strong>${avgEff}%</strong>, and step volume growing week on week.`,
-        `One pattern worth noting: the rest block in the middle of the period — days with near-zero steps and extended sleep — followed by a sustained step-count increase. That sequence (load → rest → rebuild) is textbook progressive overload, whether intentional or not.`,
-        `Sleep depth is solid. <strong>${avgDeep} min</strong> of deep sleep and <strong>${avgRem} min</strong> REM average per night means both physical recovery and cognitive recovery are being served. The best deep-sleep night was <strong>${bestSleep ? Math.round(bestSleep.total_min/60*10)/10+'h total with '+bestSleep.deep+' min deep' : '—'}</strong> — a useful reference point for what optimal conditions look like.`,
-        `The <strong>${anomalyCount} HR peak days</strong> are concentrated in the back half of the period — they track the rising training load exactly. As long as resting HR remains stable or falls, these peaks are evidence of productive hard work, not overreach.`,
-      ],
+        `Over ${tfLabel}: <strong>${days}</strong> days of data, resting HR <strong>${avgRestHR??'—'} bpm</strong>, avg sleep <strong>${avgSleepHrs??'—'} hrs</strong>, daily steps averaging <strong>${avgSteps?.toLocaleString()??'—'}</strong>. All three metrics in healthy range for the period.`,
+        `Sleep is the quiet strength here. <strong>${avgDeep??'—'} min deep</strong> and <strong>${avgRem??'—'} min REM</strong> nightly means both physical and cognitive recovery are being served. ${lowSleepN > 0 ? `The <strong>${lowSleepN} short night${lowSleepN>1?'s':''}</strong> under 6 hours warrant attention — they typically follow or precede the highest-intensity days.` : 'No significantly short nights in this window.'}`,
+        `Distance of <strong>${totalDist} km</strong> and <strong>${totalCals.toLocaleString()} kcal</strong> from tracked sessions. The calorie-intensive days cluster around the HR anomaly dates — confirmation those sessions were genuinely high-output.`,
+        `Resting HR trend of <strong>${rhrTrend > 0 ? '+' : ''}${rhrTrend.toFixed(1)} bpm</strong> across this window is ${rhrTrend <= -1 ? 'a clear positive adaptation signal' : rhrTrend <= 1 ? 'essentially flat — load and recovery are balanced' : 'worth watching as training volume increases'}.`
+      ]
     ],
     heartrate: [
       [
-        `Your average resting HR of <strong>${avgRestHR} bpm</strong> is a healthy baseline. The 5th-percentile measurement method filters out incidental activity, so this figure genuinely reflects your physiological rest state. The lowest recorded resting value of <strong>${minRestHR} bpm</strong> shows what your floor looks like on your best recovery days.`,
-        `<strong>${anomalyCount} days</strong> had HR peaks above 160 bpm, reaching a high of <strong>${maxHR} bpm</strong>. Critically, the daily means on those days were unremarkable — typically 79–91 bpm — confirming these were brief, intense efforts rather than sustained elevation. The pattern is consistent with discrete gym sessions or sprint intervals.`,
-        `The hourly HR curve has a clear circadian shape: trough around 5–6am at the physiological overnight low, then a steady climb through the day peaking in the 7–9pm window. This evening peak reflects both the day's accumulated activity and likely your primary training window. It's worth noting that elevated HR close to sleep onset can delay deep sleep onset.`,
-        `Zone distribution is healthy: the vast majority of recorded time below 100 bpm, with meaningful but not excessive time in the hard and max zones. This ratio — mostly aerobic base with targeted high-intensity efforts — is broadly what endurance and performance research supports.`,
+        `Over ${tfLabel}: avg resting HR <strong>${avgRestHR??'—'} bpm</strong>, avg overall mean <strong>${avgMeanHR??'—'} bpm</strong>. The gap between resting and mean reflects how much activity is pulling the average up — a wider gap typically means more high-effort minutes.`,
+        `${anomalyCount > 0 ? `<strong>${anomalyCount} peak day${anomalyCount>1?'s':''}</strong> exceeded 160 bpm (highest: <strong>${maxHR} bpm</strong>). Daily means on those days were unremarkable, meaning these were brief, intense spikes — exactly what structured training produces.` : 'No HR peaks above 160 bpm in this window — likely a recovery or lower-intensity period.'}`,
+        `Resting HR range this period: <strong>${minRestHR??'—'}–${hr.length?Math.max(...hr.map(r=>r.resting)):'—'} bpm</strong>. Day-to-day variation within a few bpm is normal. Sustained rises of 5+ bpm above your personal baseline over 2–3 consecutive days are the signal to watch for fatigue.`,
+        `The hourly HR pattern peaks in the evening — typical for people who train later in the day. Elevated HR close to sleep onset delays deep sleep onset. If sleep quality ever dips, shifting training earlier by 1–2 hours is the highest-leverage intervention.`
       ],
       [
-        `Resting HR of <strong>${avgRestHR} bpm</strong> averaged across the period, with a trend that's <strong>${rhrTrend <= 0 ? 'falling' : 'slightly rising'}</strong> — ${rhrTrend <= 0 ? 'a direct indicator of improving cardiovascular efficiency as training volume increases' : 'worth monitoring; slight RHR elevation often precedes overreaching if load keeps rising without adequate recovery'}. Week-to-week direction matters more than any single day.`,
-        `The <strong>${anomalyCount} HR anomaly days</strong> cluster in the higher-activity period. Cross-referencing with activity data, these correspond to sessions burning 300–700 active calories. The fact that next-morning resting HR was not consistently elevated after these days suggests the body absorbed the load well.`,
-        `Average overall mean HR of <strong>${avgMeanHR} bpm</strong> against a resting value of <strong>${avgRestHR} bpm</strong> means most of each day is spent well above the true rest state — reflecting both ambient activity and the nature of wearable HR capture (which includes postural and digestive responses as well as exercise).`,
-        `The evening HR peak in the hourly profile (7–9pm average above 90 bpm) is the most actionable insight here. If sleep onset or deep sleep quality is ever a concern, shifting the primary training window earlier by 1–2 hours is the single highest-leverage intervention, allowing HR and core temperature to fall before bed.`,
-      ],
+        `Resting HR over ${tfLabel}: <strong>${avgRestHR??'—'} bpm</strong> average, trending <strong>${rhrTrend <= 0 ? 'down ' + Math.abs(rhrTrend).toFixed(1) + ' bpm' : 'up ' + rhrTrend.toFixed(1) + ' bpm'}</strong>. ${rhrTrend <= 0 ? 'A falling resting HR is the clearest single-number indicator of improving cardiovascular fitness.' : 'A rising trend alongside increased load can be an early fatigue signal — worth monitoring.'}`,
+        `HR zone distribution this window shows the balance between base aerobic work and high-intensity efforts. The current mix — mostly below 100 bpm with targeted spikes — aligns with what progressive training models recommend.`,
+        `With a lowest recorded resting value of <strong>${minRestHR??'—'} bpm</strong> and <strong>${anomalyCount}</strong> high-intensity spike day${anomalyCount===1?'':'s'}, the data suggests a system that's both capable of high output and recovering adequately between efforts.`,
+        `${anomalyCount > 1 ? `The ${anomalyCount} spike days are spread across the window rather than clustered — spacing hard efforts with recovery days between them is optimal for adaptation.` : 'Consistent moderate HR with the occasional hard effort is a sustainable training pattern.'}`
+      ]
     ],
     sleep: [
       [
-        `Sleep quality across this dataset is a genuine strength. Average duration of <strong>${avgSleepHrs} hours</strong> sits comfortably above the recommended floor, and <strong>${avgEff}%</strong> efficiency means very little time lying awake — the body is using its time in bed productively.`,
-        `Deep sleep averaging <strong>${avgDeep} min</strong> per night is at or above the 90-minute threshold associated with adequate physical recovery. This is the stage where growth hormone is released and tissue repair occurs — its consistency across the period is a good sign given the increasing training load.`,
-        `REM averaging <strong>${avgRem} min</strong> (approximately 24% of total sleep) is in the healthy range for cognitive and emotional recovery. The highest-REM night in the dataset — likely a rebound session — reflects the brain making up accumulated REM debt after a hard training block.`,
-        `Wake time within sleep (average <strong>${avgWake} min</strong> per night) is low. The one outlier night with ~80 minutes of wake time is worth noting — it's typically a sign of either high cortisol going into bed or an environmental disruption. Checking what happened that day would help distinguish the two.`,
+        `Sleep over ${tfLabel}: <strong>${avgSleepHrs??'—'} hrs</strong> average across <strong>${sl.length}</strong> nights, efficiency <strong>${avgEff??'—'}%</strong>. Duration is ${avgSleepHrs >= 7 ? 'above the recommended minimum' : 'slightly below the 7-hour threshold — worth prioritising'}.`,
+        `Deep sleep averaging <strong>${avgDeep??'—'} min</strong> is ${avgDeep >= 90 ? 'at or above the 90-minute threshold associated with adequate physical recovery — the stage where growth hormone is released and tissue repair occurs' : 'below the 90-minute target. Light sleep and late nights are the most common culprits'}.`,
+        `REM at <strong>${avgRem??'—'} min</strong> per night covers cognitive and emotional recovery. ${highSleepN > 0 ? `The <strong>${highSleepN}</strong> extended night${highSleepN>1?'s':''} over 9.5 hours in this window likely reflect recovery from hard training days — the body self-regulating.` : 'Duration consistency is good across this window.'}`,
+        `Sleep efficiency of <strong>${avgEff??'—'}%</strong> means ${avgEff >= 95 ? 'very little time lying awake — the body is using its time in bed productively' : 'some wakeful periods worth tracking. Waking HR and pre-sleep activity are the main variables to examine'}.`
       ],
       [
-        `<strong>${avgSleepHrs} hours</strong> of average nightly sleep with <strong>${avgDeep} min deep</strong> and <strong>${avgRem} min REM</strong> — all three figures are above the population median. The combination suggests not just adequate quantity but genuinely restorative quality.`,
-        `The <strong>${lowSleepN} nights under 6 hours</strong> are the data points to watch. Even isolated short nights have measurable effects on next-day HRV, reaction time, and appetite regulation. Cross-referencing with the activity data, these tend to follow or precede the high-intensity training days — either because of late training or early obligations.`,
-        `${highSleepN > 1 ? `The <strong>${highSleepN} long nights exceeding 9.5 hours</strong> are almost certainly recovery nights following peak-load days — the body self-correcting. This kind of elastic response (hard day → long sleep) is a healthy sign of intact homeostatic regulation.` : `Sleep duration is notably consistent — few nights deviate dramatically from the average. That regularity itself is a positive: the circadian rhythm appears well-anchored.`}`,
-        `Sleep HR ranging from the low 60s to low 80s bpm depending on the night reflects the varying recovery demands placed on the system. On the highest-sleep-HR nights, the autonomic nervous system is still processing the previous day's load during what should be restoration time — these nights tend to produce slightly less deep sleep as a result.`,
-      ],
+        `Over ${tfLabel}, <strong>${lowSleepN}</strong> night${lowSleepN===1?'':'s'} fell below 6 hours. ${lowSleepN === 0 ? 'No significantly short nights — strong sleep consistency for this window.' : 'Even isolated short nights have measurable next-day effects on HRV, reaction time, and appetite regulation.'}`,
+        `Best deep-sleep night this period: ${bestSleep ? `<strong>${bestSleep.deep} min deep</strong> on ${bestSleep.label}` : '—'}. That's a useful reference for what optimal conditions look like — what was different about that day?`,
+        `Average wake time within sleep: <strong>${avgWake??'—'} min</strong>. ${avgWake <= 10 ? 'Very low — indicating strong sleep pressure and good sleep hygiene.' : avgWake <= 20 ? 'Moderate — a few brief awakenings is normal.' : 'Above average — worth examining pre-sleep habits and training timing.'}`,
+        `The sleep-HR picture across this window: nights with higher sleep HR tend to follow harder training days. This is the autonomic nervous system still processing load during what should be restoration time — normal, but worth watching if it becomes a consistent pattern.`
+      ]
     ],
     activity: [
       [
-        `The defining feature of your activity data is the trajectory. 7-day rolling average climbing from <strong>${firstRoll.toLocaleString()}</strong> to <strong>${latestRoll.toLocaleString()}</strong> — a <strong>${rollMultiple}×</strong> increase — over the period. That's a sustained directional shift, not a single good week.`,
-        `Daily step average of <strong>${avgSteps?.toLocaleString()}</strong> across the full period is pulled down by the early rest block. The recent weeks are operating at a fundamentally different level — the rolling average of <strong>${latestRoll.toLocaleString()}</strong> is a better representation of current baseline. ${daysAbove10k > 0 ? `<strong>${daysAbove10k} days</strong> hit the 10,000-step mark, peaking at <strong>${maxSteps?.toLocaleString()}</strong> steps.` : ''}`,
-        `The hourly step distribution peaks in the 1pm, 6–7pm, and 9–10pm windows. This evening-heavy pattern suggests deliberate movement is concentrated in the second half of the day. Whether that's training sessions, evening walks, or general lifestyle — adding even light morning movement would extend the active window and support metabolic consistency.`,
-        `<strong>${totalCals.toLocaleString()} kcal</strong> of recorded active burn, spread across <strong>${totalDist} km</strong> of distance. The calorie-intensive days cluster in May and align precisely with the HR anomaly dates — confirming those sessions were genuinely high-output, not just high-step.`,
+        `Activity over ${tfLabel}: <strong>${avgSteps?.toLocaleString()??'—'}</strong> avg steps/day, <strong>${totalDist} km</strong> distance, <strong>${totalCals.toLocaleString()} kcal</strong> active burn. ${daysAbove10k > 0 ? `<strong>${daysAbove10k}</strong> day${daysAbove10k>1?'s':''} above 10,000 steps.` : ''}`,
+        `7-day rolling average ${latestRoll !== firstRoll ? `moved from <strong>${firstRoll.toLocaleString()}</strong> to <strong>${latestRoll.toLocaleString()}</strong>` : `steady at <strong>${latestRoll.toLocaleString()}</strong>`} across this window — ${latestRoll >= 10000 ? 'above the 10k daily target' : latestRoll >= 7000 ? 'approaching the 10k goal' : 'building toward the 10k baseline'}.`,
+        `${maxSteps && maxStepsDay ? `Peak single day: <strong>${maxSteps.toLocaleString()}</strong> steps on ${maxStepsDay.date}. That ceiling shows what's possible — the question is making that level more routine.` : ''}${highCalDays.length > 0 ? ` <strong>${highCalDays.length}</strong> session${highCalDays.length>1?'s':''} burned over 400 active calories — these are your high-output training days.` : ''}`,
+        `The hourly step distribution shows movement concentrated in the afternoon and evening. Morning movement is the lowest-hanging fruit for increasing daily totals without restructuring your schedule.`
       ],
       [
-        `Step count tells the clearest story in this dataset. The first full week averaged under 3,000 steps/day; the final week averaged over 9,000. That kind of progression across five weeks reflects a real increase in daily movement, not just better tracking.`,
-        `Peak single day: <strong>${maxSteps?.toLocaleString()}</strong> steps${maxStepsDay ? ` on ${maxStepsDay.date}` : ''}. That's the ceiling — and it suggests the capacity for high-movement days exists. The question is how consistently that level becomes the norm rather than the exception.`,
-        `The hourly distribution reveals that almost no movement is recorded before 8am. Whether this is lifestyle or a device-wear gap, the morning window is the lowest-hanging fruit for increasing daily step count — a 15-minute walk before 9am would add roughly 1,500–2,000 steps without requiring any schedule restructuring.`,
-        `Distance of <strong>${totalDist} km</strong> and <strong>${totalCals.toLocaleString()} kcal</strong> from tracked sessions represents the structured activity component. The unstructured step count (not captured as formal sessions) is layered on top — between the two, the weekly active energy expenditure trend is clearly increasing.`,
-      ],
+        `Over ${tfLabel}, total active distance: <strong>${totalDist} km</strong>, active calories: <strong>${totalCals.toLocaleString()}</strong>. ${totalDist > 20 ? 'Strong volume for the window.' : 'Building volume — consistent daily movement compounds quickly.'}`,
+        `Daily step average of <strong>${avgSteps?.toLocaleString()??'—'}</strong> for this period. ${avgSteps >= 10000 ? 'Above the 10k goal — excellent.' : avgSteps >= 7000 ? 'Within reach of the 10k goal most days.' : 'The 7-day rolling trend matters more than the average — direction counts.'}`,
+        `Rolling 7-day average is <strong>${latestRoll.toLocaleString()}</strong>. ${latestRoll > firstRoll ? `Up from <strong>${firstRoll.toLocaleString()}</strong> at the start of this window — positive momentum.` : latestRoll === firstRoll ? 'Holding steady — maintenance mode.' : `Down from <strong>${firstRoll.toLocaleString()}</strong> — check whether this reflects a planned recovery week.`}`,
+        `${highCalDays.length > 0 ? `The <strong>${highCalDays.length}</strong> high-calorie session${highCalDays.length>1?'s':''} (400+ kcal) in this window align with the HR spike days — confirming those efforts were genuinely high-output. The ratio of high-intensity to moderate activity looks sustainable.` : 'Activity this window has been moderate-intensity — a solid base-building pattern.'}`
+      ]
     ],
     insights: [
       [
-        `The cross-dataset picture shows a system under increasing load that's adapting rather than cracking. Resting HR is ${rhrTrend <= 0 ? 'trending down' : 'stable'}, sleep efficiency is high, and activity volume is rising week-on-week — three indicators pointing in the same direction.`,
-        `Circadian consistency is the most actionable lever here. Sleep onset varies more than wake time, which is the more common pattern — social and training schedules pull bedtime later on high-effort days. Tightening onset to within 45 minutes of a consistent target would likely improve deep sleep proportion without changing total duration.`,
-        `The sleep-to-next-day-steps correlation suggests that sleep quality has a modest but real influence on next-day activity. This creates a positive feedback loop worth exploiting: better sleep → more movement → better fitness → better sleep. The data is already showing early signs of this cycle working.`,
-        `Resting HR trend of ${rhrTrend > 0 ? '+' : ''}${rhrTrend.toFixed(1)} bpm across the period is ${rhrTrend <= -2 ? 'a clear positive adaptation signal — the heart is becoming more efficient at rest as training load rises' : rhrTrend <= 0 ? 'flat, meaning fitness is being maintained under rising load — a good sign' : 'worth watching. A rising RHR trend alongside rising training load can be an early fatigue indicator. An easier week in the near term would likely bring it back down'}.`,
+        `Cross-dataset view over ${tfLabel}: resting HR <strong>${avgRestHR??'—'} bpm</strong>, sleep <strong>${avgSleepHrs??'—'} hrs</strong> avg, steps <strong>${avgSteps?.toLocaleString()??'—'}</strong>/day. The three metrics are ${rhrTrend <= 0 && avgSteps >= 7000 ? 'pointing in the right direction simultaneously — a positive signal' : 'in different phases — useful for understanding which lever to pull next'}.`,
+        `The sleep-to-next-day activity link is the most actionable insight in this dataset. When sleep efficiency is high and deep sleep is above 90 min, next-day step counts tend to be higher. This feedback loop — better sleep → more movement → better fitness → better sleep — is already visible in your data.`,
+        `Training load in this window shows ${anomalyCount} hard effort${anomalyCount===1?'':'s'}. ${anomalyCount > 0 ? `Those sessions produced the expected response: brief HR spikes with normal resting HR the following day. The body absorbed the load well.` : 'A recovery or base-building phase — resting HR and sleep quality should be optimal right now.'}`,
+        `Resting HR trend of <strong>${rhrTrend > 0 ? '+' : ''}${rhrTrend.toFixed(1)} bpm</strong> over this window is the summary metric for fitness direction. ${rhrTrend <= -1 ? 'Falling — adaptation is happening.' : rhrTrend <= 1 ? 'Flat — load and recovery are balanced.' : 'Rising — consider whether recovery is keeping pace with training.'}`
       ],
       [
-        `The most interesting cross-signal in this dataset is the load-to-sleep relationship. Hard training days don't appear to harm sleep quality — if anything, the highest-intensity sessions are followed by nights with above-average deep sleep. That's the recovery response working correctly.`,
-        `Sleep debt balance across the period is positive — total duration has broadly kept pace with (or exceeded) the nominal target. The short nights that do appear are isolated rather than sequential, which matters: it's consecutive nights of short sleep that accumulate performance cost, not isolated misses.`,
-        `The step-count increase in the back half of the period coincides with a slight increase in sleep HR on some nights. This is expected — higher daily load means the heart is still processing work during sleep. As long as this doesn't translate to reduced deep sleep or rising resting HR over multi-week periods, it's a normal adaptation signal.`,
-        `Week-over-week resting HR ${rhrTrend <= 0 ? 'is declining or flat — the most reliable single-number indicator that cardiovascular fitness is improving. Keep current load and recovery balance' : 'has ticked up slightly. This is common when stepping up volume quickly. Prioritise sleep consistency and one lower-intensity week every 3–4 weeks to allow full adaptation'}.`,
-      ],
-    ],
+        `Over ${tfLabel}, the data shows ${sl.length} sleep sessions, ${am.length} activity days, ${hr.length} HR days. Cross-referencing: the highest-activity days are followed by above-average deep sleep — the recovery response working correctly.`,
+        `Circadian pattern this window: sleep onset and wake times tell the story of schedule consistency. Tight clustering (less than 45-minute variation) correlates with more deep sleep regardless of total duration — the body clock optimises slow-wave onset around a habitual bedtime.`,
+        `The load-recovery balance looks ${anomalyCount > 0 && rhrTrend <= 1 ? 'healthy — hard efforts being absorbed without resting HR elevation' : anomalyCount > 0 && rhrTrend > 1 ? 'slightly stressed — hard efforts plus a rising resting HR trend suggests more recovery time would help' : 'conservative — good baseline to build from'}.`,
+        `Week-over-week resting HR is the single most reliable fitness direction indicator in this dataset. ${rhrTrend <= -1 ? 'It\'s falling — keep current load and recovery balance.' : rhrTrend <= 1 ? 'It\'s flat — either maintain or add load incrementally.' : 'It\'s rising — a lighter week would let adaptation catch up.'}`
+      ]
+    ]
   };
 
   const tabPools = pools[tab] || pools.overview;
-  // Pick a random variant from the pool each time
-  const paras = tabPools[Math.floor(Math.random() * tabPools.length)];
+  const paras = pickVariant(tabPools);
   return paras.map(p=>`<p>${p}</p>`).join('');
-}
-
-// ─── THEME TOGGLE ─────────────────────────────────────────────────────────────
-function toggleTheme() {
-  const root = document.documentElement;
-  const current = root.getAttribute('data-theme') || 'dark';
-  const next = current === 'dark' ? 'light' : 'dark';
-  root.setAttribute('data-theme', next);
-  document.getElementById('themeToggle').textContent = next === 'dark' ? '🌙' : '☀️';
-  localStorage.setItem('hd_theme', next);
-  // Redraw all active charts so colours update
-  const activeView = document.querySelector('.view.active');
-  if (activeView) {
-    const id = activeView.id.replace('view-','');
-    if (id==='overview') renderOverview();
-    else if (id==='heartrate') renderHeartRate();
-    else if (id==='sleep') renderSleep();
-    else if (id==='activity') renderActivity();
-    else if (id==='insights') renderInsights();
-  }
-}
-
-
-// ─── INSIGHTS ─────────────────────────────────────────────────────────────────
-function pearsonR(xs, ys) {
-  const n = xs.length;
-  if (n < 3) return 0;
-  const mx = xs.reduce((a,b)=>a+b)/n, my = ys.reduce((a,b)=>a+b)/n;
-  let num=0, dx2=0, dy2=0;
-  for (let i=0;i<n;i++) { const dx=xs[i]-mx, dy=ys[i]-my; num+=dx*dy; dx2+=dx*dx; dy2+=dy*dy; }
-  return (dx2&&dy2) ? num/Math.sqrt(dx2*dy2) : 0;
-}
-
-function timeToHr(t) {
-  // "HH:MM" -> decimal hour, normalising sleep onset to 0-10 range (midnight=0, 3am=3, 11pm=23->-1)
-  if (!t) return null;
-  const [hh, mm] = t.split(':').map(Number);
-  let hr = hh + mm/60;
-  // Normalise sleep onset: times after noon are "previous night" (e.g. 23:00 = -1h)
-  return hr;
-}
-
-function renderInsights() {
-  const sl  = filterByTF(STATE.sleep||[], 'insights').filter(s=>s.total_min>=120);
-  const am  = filterByTF(STATE.am_daily||[], 'insights');
-  const hr  = filterByTF(STATE.hr_daily||[], 'insights');
-  const ast = filterByTF(STATE.ast_daily||[], 'insights');
-  const target = parseFloat(document.getElementById('sleepTargetHrs')?.value||8);
-  const gc = getGC();
-
-  // ── Per-night sleep (dedupe: pick longest session per date) ────────────────
-  const byDate = {};
-  sl.forEach(s => {
-    if (!byDate[s.date] || s.total_min > byDate[s.date].total_min) byDate[s.date] = s;
-  });
-  const nights = Object.values(byDate).sort((a,b)=>a.date.localeCompare(b.date));
-
-  // ── SLEEP DEBT ─────────────────────────────────────────────────────────────
-  let running = 0;
-  const debtDates=[], debtVals=[], nightlyDiff=[], nightlyHrs=[];
-  nights.forEach(n => {
-    const hrs = n.total_min/60;
-    const diff = hrs - target;
-    running += diff;
-    debtDates.push(n.label);
-    debtVals.push(+running.toFixed(2));
-    nightlyDiff.push(+diff.toFixed(2));
-    nightlyHrs.push(+hrs.toFixed(2));
-  });
-
-  const totalDebt = running;
-  const avgNightly = nights.length ? avg(nightlyHrs) : 0;
-  const shortNights = nights.filter(n=>n.total_min/60 < target-0.5).length;
-
-  document.getElementById('ins-debt-metrics').innerHTML = `
-    <div class="metric"><div class="metric-label">Current balance</div>
-      <div class="metric-value" style="color:${totalDebt>=0?'var(--green)':'var(--red)'}">
-        ${totalDebt>=0?'+':''}${totalDebt.toFixed(1)} <span>hrs</span></div>
-      <div class="metric-sub">${totalDebt>=0?'surplus':'deficit'} vs ${target}h target</div></div>
-    <div class="metric"><div class="metric-label">Avg nightly sleep</div>
-      <div class="metric-value">${avgNightly.toFixed(1)} <span>hrs</span></div></div>
-    <div class="metric"><div class="metric-label">Nights below target</div>
-      <div class="metric-value">${shortNights} <span>/ ${nights.length}</span></div></div>
-    <div class="metric"><div class="metric-label">Best single night</div>
-      <div class="metric-value">${nights.length?Math.max(...nightlyHrs).toFixed(1):'—'} <span>hrs</span></div></div>
-  `;
-
-  destroyChart('ins-debt-chart');
-  charts['ins-debt-chart'] = new Chart(document.getElementById('ins-debt-chart'), {
-    type:'line',
-    data:{ labels:debtDates, datasets:[
-      { label:'Cumulative balance (hrs)', data:debtVals,
-        borderColor: debtVals.map((_,i)=>debtVals[i]>=0?'#4fd1c5':'#e53e3e'),
-        segment:{ borderColor: ctx => ctx.p1.parsed.y>=0?'#4fd1c5':'#e53e3e' },
-        backgroundColor: ctx => {
-          const v = ctx.chart.data.datasets[0].data[ctx.dataIndex];
-          return v>=0 ? 'rgba(79,209,197,0.1)' : 'rgba(229,62,62,0.1)';
-        },
-        borderWidth:2, pointRadius:3, tension:0.3, fill:true }
-    ]},
-    options:{ ...baseOpts(undefined,undefined,v=>v+'h'),
-      plugins:{ legend:{display:false}, tooltip:{ ...gc.tooltip, callbacks:{ label:ctx=>`Balance: ${ctx.parsed.y>0?'+':''}${ctx.parsed.y}h` } } }
-    }
-  });
-
-  destroyChart('ins-nightly-chart');
-  charts['ins-nightly-chart'] = new Chart(document.getElementById('ins-nightly-chart'), {
-    type:'bar',
-    data:{ labels:debtDates, datasets:[
-      { label:'Sleep hrs', data:nightlyHrs,
-        backgroundColor:nightlyHrs.map(v=>v>=target?'rgba(128,90,213,0.6)':'rgba(229,62,62,0.5)'), borderWidth:0 },
-      { type:'line', label:'Target', data:nights.map(()=>target),
-        borderColor:'rgba(255,255,255,0.25)', borderDash:[5,4], borderWidth:1.5, pointRadius:0 }
-    ]},
-    options:{ ...baseOpts(0,undefined,v=>v+'h'),
-      plugins:{ legend:{display:false}, tooltip:{ ...gc.tooltip, callbacks:{ label:ctx=>ctx.dataset.label==='Target'?`Target: ${target}h`:`Sleep: ${ctx.parsed.y}h` } } }
-    }
-  });
-
-  // ── CIRCADIAN ──────────────────────────────────────────────────────────────
-  // sleep onset: treat 20-24h as negative (-4 to 0), 0-12h as 0-12
-  function normalisedOnset(t) {
-    const hr = timeToHr(t);
-    if (hr === null) return null;
-    return hr >= 18 ? hr - 24 : hr; // 23:00 → -1, 22:00 → -2
-  }
-  const onsets = nights.map(n=>normalisedOnset(n.start)).filter(v=>v!==null);
-  const wakes  = nights.map(n=>timeToHr(n.end)).filter(v=>v!==null);
-  const onsetStd = (() => { if(!onsets.length) return 0; const m=avg(onsets); return Math.sqrt(avg(onsets.map(v=>(v-m)**2))); })();
-  const wakeStd  = (() => { if(!wakes.length)  return 0; const m=avg(wakes);  return Math.sqrt(avg(wakes.map(v=>(v-m)**2))); })();
-  const consistencyScore = Math.max(0, Math.round(100 - (onsetStd + wakeStd)*10));
-
-  document.getElementById('ins-circadian-metrics').innerHTML = `
-    <div class="metric metric-accent"><div class="metric-label">Consistency score</div>
-      <div class="metric-value">${consistencyScore}<span>/100</span></div>
-      <div class="metric-sub">higher = more regular</div></div>
-    <div class="metric"><div class="metric-label">Sleep onset SD</div>
-      <div class="metric-value">${onsetStd.toFixed(1)} <span>hrs</span></div>
-      <div class="metric-sub">night-to-night variation</div></div>
-    <div class="metric"><div class="metric-label">Wake time SD</div>
-      <div class="metric-value">${wakeStd.toFixed(1)} <span>hrs</span></div></div>
-  `;
-
-  destroyChart('ins-circadian-chart');
-  charts['ins-circadian-chart'] = new Chart(document.getElementById('ins-circadian-chart'), {
-    type:'line',
-    data:{ labels:nights.map(n=>n.label), datasets:[
-      { label:'Sleep onset (hr)', data:nights.map(n=>normalisedOnset(n.start)),
-        borderColor:'#4fd1c5', backgroundColor:'transparent', borderWidth:2, pointRadius:4, tension:0.2 },
-      { label:'Wake time (hr)', data:nights.map(n=>timeToHr(n.end)),
-        borderColor:'#f6ad55', backgroundColor:'transparent', borderWidth:2, pointRadius:4, tension:0.2 }
-    ]},
-    options:{ ...baseOpts(undefined,undefined,v=>{ const a=Math.abs(v),h=Math.floor(a),m=Math.round((a-h)*60); return `${v<0?'-':''}${h}:${m.toString().padStart(2,'0')}`; }),
-      plugins:{ legend:{display:false}, tooltip:{ ...gc.tooltip, callbacks:{ label:ctx=>{ const v=ctx.parsed.y; const a=Math.abs(v),hh=Math.floor(a),mm=Math.round((a-hh)*60); return `${ctx.dataset.label}: ${v<0?'-':''}${hh}:${mm.toString().padStart(2,'0')}`; } } } }
-    }
-  });
-
-  // ── CORRELATIONS ──────────────────────────────────────────────────────────
-  // 1. Sleep efficiency → next-day steps
-  const amMap = Object.fromEntries(am.map(r=>[r.date,r.steps]));
-  const corrData1 = nights.map(n => {
-    const nextDate = new Date(n.date+'T12:00:00');
-    nextDate.setDate(nextDate.getDate()+1);
-    const nd = nextDate.toISOString().slice(0,10);
-    const steps = amMap[nd];
-    return steps!=null ? { x:+n.efficiency.toFixed(1), y:steps, label:n.label } : null;
-  }).filter(Boolean);
-  const r1 = pearsonR(corrData1.map(d=>d.x), corrData1.map(d=>d.y));
-
-  // 2. Training load (HR-zone weighted active-min) → deep sleep that night
-  const hrMap = Object.fromEntries(hr.map(r=>[r.date,r]));
-  const astMap = Object.fromEntries(ast.map(r=>[r.date,r]));
-  const corrData2 = nights.map(n => {
-    const h = hrMap[n.date];
-    const a = astMap[n.date];
-    if (!h || !a) return null;
-    // Load = active_min capped at 400, weighted by max HR proximity
-    const load = Math.min(a.active_min||0, 400) * (1 + (h.max - h.resting) / 100);
-    return { x:+load.toFixed(0), y:n.deep, label:n.label };
-  }).filter(Boolean);
-  const r2 = pearsonR(corrData2.map(d=>d.x), corrData2.map(d=>d.y));
-
-  // 3. Resting HR weekly average
-  const hrSorted = [...hr].sort((a,b)=>a.date.localeCompare(b.date));
-  const weekBuckets = {};
-  hrSorted.forEach(r => {
-    const dt = new Date(r.date+'T12:00:00');
-    const mon = new Date(dt); mon.setDate(dt.getDate()-((dt.getDay()+6)%7));
-    const wk = mon.toISOString().slice(0,10);
-    if (!weekBuckets[wk]) weekBuckets[wk] = [];
-    weekBuckets[wk].push(r.resting);
-  });
-  const wkLabels = Object.keys(weekBuckets).sort();
-  const wkAvgs = wkLabels.map(w=>+avg(weekBuckets[w]).toFixed(1));
-  const rhrTrend = wkAvgs.length>1 ? wkAvgs[wkAvgs.length-1]-wkAvgs[0] : 0;
-
-  // correlation summary metrics
-  document.getElementById('ins-corr-metrics').innerHTML = `
-    <div class="metric"><div class="metric-label">Sleep→steps correlation</div>
-      <div class="metric-value" style="color:${Math.abs(r1)>0.3?'var(--accent)':'var(--text2)'}">r = ${r1.toFixed(2)}</div>
-      <div class="metric-sub">${Math.abs(r1)<0.2?'weak':Math.abs(r1)<0.4?'moderate':'strong'} ${r1>0?'positive':'negative'} link</div></div>
-    <div class="metric"><div class="metric-label">Load→deep sleep correlation</div>
-      <div class="metric-value" style="color:${Math.abs(r2)>0.3?'var(--accent)':'var(--text2)'}">r = ${r2.toFixed(2)}</div>
-      <div class="metric-sub">${Math.abs(r2)<0.2?'weak':Math.abs(r2)<0.4?'moderate':'strong'} ${r2>0?'positive':'negative'} link</div></div>
-    <div class="metric"><div class="metric-label">Resting HR trend</div>
-      <div class="metric-value" style="color:${rhrTrend<=0?'var(--green)':'var(--red)'}">${rhrTrend>0?'+':''}${rhrTrend.toFixed(1)} <span>bpm</span></div>
-      <div class="metric-sub">${rhrTrend<=0?'improving ↓':'elevated ↑'} across period</div></div>
-    <div class="metric"><div class="metric-label">Weekly RHR range</div>
-      <div class="metric-value">${wkAvgs.length?Math.min(...wkAvgs).toFixed(0):'—'}<span>–</span>${wkAvgs.length?Math.max(...wkAvgs).toFixed(0):'—'} <span>bpm</span></div></div>
-  `;
-
-  destroyChart('ins-corr1-chart');
-  charts['ins-corr1-chart'] = new Chart(document.getElementById('ins-corr1-chart'), {
-    type:'scatter',
-    data:{ datasets:[{ label:'Sleep eff → steps', data:corrData1,
-      backgroundColor:'rgba(99,179,237,0.6)', pointRadius:6, pointHoverRadius:8 }]},
-    options:{ responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{display:false}, tooltip:{ ...gc.tooltip, callbacks:{ label:ctx=>`${ctx.raw.label}: eff ${ctx.raw.x}% → ${ctx.raw.y.toLocaleString()} steps` } } },
-      scales:{
-        x:{ title:{display:true,text:'Sleep efficiency (%)',color:gc.tcolor,font:{size:11}}, ticks:{color:gc.tcolor,font:{size:11}}, grid:{color:gc.color} },
-        y:{ title:{display:true,text:'Next-day steps',color:gc.tcolor,font:{size:11}}, ticks:{color:gc.tcolor,font:{size:11},callback:v=>v>=1000?Math.round(v/1000)+'k':v}, grid:{color:gc.color} }
-      }
-    }
-  });
-
-  destroyChart('ins-corr2-chart');
-  charts['ins-corr2-chart'] = new Chart(document.getElementById('ins-corr2-chart'), {
-    type:'scatter',
-    data:{ datasets:[{ label:'Load → deep sleep', data:corrData2,
-      backgroundColor:'rgba(246,173,85,0.65)', pointRadius:6, pointHoverRadius:8 }]},
-    options:{ responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{display:false}, tooltip:{ ...gc.tooltip, callbacks:{ label:ctx=>`${ctx.raw.label}: load ${ctx.raw.x} → ${ctx.raw.y}min deep` } } },
-      scales:{
-        x:{ title:{display:true,text:'Training load score',color:gc.tcolor,font:{size:11}}, ticks:{color:gc.tcolor,font:{size:11}}, grid:{color:gc.color} },
-        y:{ title:{display:true,text:'Deep sleep (min)',color:gc.tcolor,font:{size:11}}, ticks:{color:gc.tcolor,font:{size:11}}, grid:{color:gc.color} }
-      }
-    }
-  });
-
-  destroyChart('ins-rhr-chart');
-  charts['ins-rhr-chart'] = new Chart(document.getElementById('ins-rhr-chart'), {
-    type:'bar',
-    data:{ labels:hrSorted.map(r=>fmt(r.date)), datasets:[
-      { type:'bar', label:'Daily resting HR', data:hrSorted.map(r=>r.resting),
-        backgroundColor:'rgba(229,62,62,0.25)', borderWidth:0, order:2 },
-      { type:'line', label:'Weekly avg',
-        data:(()=>{ const out=new Array(hrSorted.length).fill(null);
-          hrSorted.forEach((r,i)=>{ const wk=wkLabels.find(w=>{ const wd=new Date(w); const rd=new Date(r.date+'T12:00:00'); return rd>=wd && rd<new Date(wd.getTime()+7*864e5); }); if(wk){ const idx=wkLabels.indexOf(wk); out[i]=wkAvgs[idx]; } }); return out; })(),
-        borderColor:'#4fd1c5', backgroundColor:'transparent', borderWidth:2.5, pointRadius:0, tension:0, spanGaps:true, order:1 }
-    ]},
-    options:{ ...baseOpts(50,undefined,v=>v+' bpm'),
-      plugins:{ legend:{display:false}, tooltip:{ ...gc.tooltip, mode:'index', intersect:false } }
-    }
-  });
-
-  setTimeout(addExpandButtons, 50);
-}
-
-// ─── NAVIGATION ──────────────────────────────────────────────────────────────
-
-
-// ─── SUPABASE CONFIG UI ───────────────────────────────────────────────────────
-function showSBSetup() {
-  const form = document.getElementById('sbSetupForm');
-  if (form) form.style.display = 'block';
-  // Pre-fill if already configured
-  if (SB) {
-    const u = document.getElementById('sbUrl');
-    const k = document.getElementById('sbKey');
-    if (u) u.value = SB.url || '';
-    if (k) k.value = SB.key || '';
-  }
-}
-function hideSBSetup() {
-  const form = document.getElementById('sbSetupForm');
-  if (form) form.style.display = 'none';
-}
-
-async function saveSBConfig() {
-  const url = (document.getElementById('sbUrl')?.value||'').trim().replace(/\/+$/, '');
-  const key = (document.getElementById('sbKey')?.value||'').trim();
-  const statusEl = document.getElementById('sbFormStatus');
-
-  if (!url || !key) { statusEl.textContent = '✗ Both fields required'; statusEl.style.color='var(--red)'; return; }
-  if (!url.includes('supabase.co')) { statusEl.textContent = '✗ URL should be your-project.supabase.co'; statusEl.style.color='var(--red)'; return; }
-
-  statusEl.textContent = 'Connecting…'; statusEl.style.color='var(--accent3)';
-
-  // Save config and attempt a real upsert — this is the actual connection test
-  setSBConfig({ url, key });
-  try {
-    const r = await fetch(`${url}/rest/v1/health_data`, {
-      method: 'POST',
-      headers: {
-        'apikey': key,
-        'Authorization': `Bearer ${key}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates'
-      },
-      body: JSON.stringify({ id: 1, payload: STATE }),
-      signal: AbortSignal.timeout(10000)
-    });
-    if (!r.ok && r.status !== 201) {
-      const errText = await r.text().catch(()=>'');
-      clearSBConfig();
-      statusEl.textContent = `✗ Error ${r.status}: ${errText.slice(0,120) || 'check URL and key'}`;
-      statusEl.style.color = 'var(--red)';
-      return;
-    }
-  } catch(e) {
-    clearSBConfig();
-    statusEl.textContent = `✗ Network error: ${e.message}`;
-    statusEl.style.color = 'var(--red)';
-    return;
-  }
-
-  statusEl.textContent = '✓ Connected! Loading data…'; statusEl.style.color='var(--green)';
-  await loadState();
-  hideSBSetup();
-  updateSBPanelUI();
-  renderUploadView();
-  showToast('Cloud sync enabled — data syncing across devices');
-}
-
-function disconnectSB() {
-  if (!confirm('Disconnect cloud sync? Your data will remain in Supabase but this browser will switch to local storage.')) return;
-  clearSBConfig();
-  updateSyncIndicator('local');
-  updateSBPanelUI();
-  showToast('Cloud sync disconnected');
-}
-
-function updateSBPanelUI() {
-  const panel = document.getElementById('sbPanel');
-  const statusLine = document.getElementById('sbStatusLine');
-  const actions = document.getElementById('sbActions');
-  if (!panel) return;
-
-  if (SB) {
-    panel.className = 'sb-panel sb-connected';
-    if (statusLine) statusLine.innerHTML = `<span style="color:var(--green)">✓ Connected</span> — ${SB.url.replace('https://','').split('.')[0]}.supabase.co &nbsp;·&nbsp; data syncs across all devices`;
-    if (actions) actions.innerHTML = `<button class="sb-btn sb-btn-secondary" onclick="showSBSetup()">Edit</button><button class="sb-btn sb-btn-secondary" style="color:var(--accent4);border-color:var(--accent4)" onclick="disconnectSB()">Disconnect</button>`;
-  } else {
-    panel.className = 'sb-panel';
-    if (statusLine) statusLine.textContent = 'Not configured — data is stored locally in this browser only.';
-    if (actions) actions.innerHTML = `<button class="sb-btn sb-btn-secondary" onclick="showSBSetup()">Configure</button>`;
-  }
-}
-
-// ─── TIMEFRAME ────────────────────────────────────────────────────────────────
-// TF state: 0 = 1 month (default), -1 = all, N = last N days
-const TF = { overview:0, heartrate:0, sleep:0, activity:0, insights:0 };
-
-function setTF(view, days) {
-  TF[view] = days;
-  // Update button styles
-  document.querySelectorAll(`#tf-${view} .tf-btn`).forEach(b => {
-    b.classList.toggle('active', parseInt(b.dataset.days) === days);
-  });
-  // Re-render
-  if (view==='overview')   renderOverview();
-  else if (view==='heartrate') renderHeartRate();
-  else if (view==='sleep')     renderSleep();
-  else if (view==='activity')  renderActivity();
-  else if (view==='insights')  renderInsights();
-  setTimeout(addExpandButtons, 50);
-}
-
-function filterByTF(arr, view, dateKey='date') {
-  const days = TF[view] || 0;
-  if (days === -1 || !arr || !arr.length) { updateTFLabel(view, arr, dateKey); return arr; }
-  const cutoff = new Date();
-  if (days === 0) cutoff.setDate(cutoff.getDate() - 30); // 1M
-  else cutoff.setDate(cutoff.getDate() - days);
-  const isoMin = cutoff.toISOString().slice(0,10);
-  // If data is older than cutoff entirely, show all (don't return empty)
-  const newest = arr[arr.length-1]?.[dateKey] || '';
-  const oldest = arr[0]?.[dateKey] || '';
-  if (oldest > isoMin) { updateTFLabel(view, arr, dateKey); return arr; } // all data fits
-  const filtered = arr.filter(r => (r[dateKey]||'') >= isoMin);
-  const result = filtered.length >= 2 ? filtered : arr;
-  updateTFLabel(view, result, dateKey);
-  return result;
-}
-
-function updateTFLabel(view, arr, dateKey='date') {
-  const el = document.getElementById('tf-label-' + view);
-  if (!el || !arr || !arr.length) return;
-  const dates = arr.map(r=>r[dateKey]).filter(Boolean).sort();
-  if (dates.length) el.textContent = fmt(dates[0]) + ' – ' + fmt(dates[dates.length-1]);
-}
-
-// ─── REFRESH ALL ──────────────────────────────────────────────────────────────
-async function refreshAll() {
-  const btn = document.getElementById('refreshBtn');
-  btn.classList.add('spinning'); btn.disabled = true;
-  // Clear AI cache so commentary regenerates
-  Object.keys(AI_CACHE).forEach(k => delete AI_CACHE[k]);
-  // Reset AI panels to prompt state
-  ['overview','heartrate','sleep','activity','insights'].forEach(tab => {
-    const el = document.getElementById('ai-body-'+tab);
-    if (el) el.innerHTML = '<span style="color:var(--text3);font-size:12px">Click Generate for an AI summary of your data.</span>';
-    const btn2 = document.getElementById('ai-btn-'+tab);
-    if (btn2) { btn2.textContent = 'Generate ↗'; btn2.disabled = false; }
-  });
-  // Reload state from server/localStorage
-  await loadState();
-  updateDateRange();
-  // Re-render active view
-  const activeView = document.querySelector('.view.active');
-  if (activeView) {
-    const id = activeView.id.replace('view-','');
-    if (id==='overview')   renderOverview();
-    else if (id==='heartrate') renderHeartRate();
-    else if (id==='sleep')     renderSleep();
-    else if (id==='activity')  renderActivity();
-    else if (id==='insights')  renderInsights();
-    else if (id==='upload')    renderUploadView();
-  }
-  setTimeout(addExpandButtons, 50);
-  setTimeout(() => { btn.classList.remove('spinning'); btn.disabled = false; }, 400);
-  showToast('Dashboard refreshed');
-}
-
-
-// ─── AI INNER REFRESH ────────────────────────────────────────────────────────
-function refreshAI(tab) {
-  // Force fresh generation by clearing cache for this tab
-  delete AI_CACHE[tab];
-  const btn = document.getElementById('ai-inner-' + tab);
-  if (btn) btn.classList.add('spinning');
-  generateAI(tab);
-  setTimeout(() => { if (btn) btn.classList.remove('spinning'); }, 700);
 }
 
 // ─── DRAG AND DROP UPLOADS ───────────────────────────────────────────────────
