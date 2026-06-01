@@ -189,6 +189,7 @@ main{flex:1;padding:20px 0 40px}
     box-sizing:border-box;
     overflow-y:auto;
     overflow-x:hidden;
+    overscroll-behavior-y:contain;
   }
 }
 @media(min-width:769px){
@@ -279,167 +280,6 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 .table-scroll{overflow-x:auto}
-/* AI COMMENTARY */
-.ai-panel{background:var(--ai-bg);border:1px solid var(--ai-border);border-radius:var(--r2);padding:18px 20px;margin-bottom:24px;position:relative}
-.ai-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px}
-.ai-panel-title{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.1em}
-.ai-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.ai-refresh{background:none;border:1px solid var(--ai-border);color:var(--accent);font-family:var(--font);font-size:10px;padding:4px 10px;border-radius:4px;cursor:pointer;transition:all .15s;white-space:nowrap}
-.ai-refresh:hover{border-color:var(--accent);background:rgba(79,209,197,0.08)}
-.ai-refresh:disabled{opacity:.4;cursor:not-allowed}
-.ai-body{font-size:14px;color:var(--text2);line-height:1.75;min-height:40px}
-.ai-body p{margin-bottom:8px}
-.ai-body p:last-child{margin-bottom:0}
-.ai-body strong{color:var(--accent);font-weight:500}
-
-.ai-inner-refresh{background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;padding:2px 4px;border-radius:3px;line-height:1;transition:color .15s;flex-shrink:0}
-.ai-inner-refresh:hover{color:var(--accent)}
-.ai-inner-refresh.spinning{animation:spin .6s linear infinite}
-.ai-loading{display:flex;align-items:center;gap:8px;color:var(--text3);font-size:12px;font-family:var(--mono)}
-.ai-loading-dots span{animation:blink 1.2s infinite;opacity:0}
-.ai-loading-dots span:nth-child(2){animation-delay:.2s}
-.ai-loading-dots span:nth-child(3){animation-delay:.4s}
-@keyframes blink{0%,80%,100%{opacity:0}40%{opacity:1}}
-
-/* ── ASK AI CHAT ─────────────────────────────────────────────────────────── */
-.chat-fab{
-  position:fixed;bottom:80px;right:18px;z-index:200;
-  width:52px;height:52px;border-radius:50%;
-  background:var(--accent);border:none;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  font-size:22px;box-shadow:0 4px 20px rgba(79,209,197,0.4);
-  transition:transform .2s,box-shadow .2s;
-  -webkit-tap-highlight-color:transparent;
-}
-.chat-fab:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(79,209,197,0.55)}
-.chat-fab.open{background:var(--bg3);box-shadow:0 2px 12px rgba(0,0,0,0.3)}
-@media(min-width:769px){
-  .chat-fab{bottom:24px;right:24px}
-}
-.chat-panel{
-  position:fixed;bottom:0;right:0;z-index:199;
-  width:100%;max-width:420px;
-  height:70vh;max-height:600px;
-  background:var(--bg2);border:1px solid var(--border2);
-  border-radius:20px 20px 0 0;
-  display:flex;flex-direction:column;
-  transform:translateY(110%);
-  transition:transform .32s cubic-bezier(.4,0,.2,1);
-  box-shadow:0 -8px 40px rgba(0,0,0,0.25);
-}
-@media(max-width:768px){
-  .chat-panel{
-    height:85vh;
-    border-radius:24px 24px 0 0;
-    padding-bottom:env(safe-area-inset-bottom,0px);
-  }
-}
-.chat-panel.open{transform:translateY(0)}
-@media(min-width:769px){
-  .chat-panel{
-    bottom:80px;right:24px;
-    border-radius:16px;
-    height:520px;max-height:520px;
-  }
-}
-.chat-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:14px 18px 10px;
-  border-bottom:1px solid var(--border);
-  flex-shrink:0;
-}
-.chat-header-title{
-  display:flex;align-items:center;gap:8px;
-  font-family:var(--mono);font-size:12px;color:var(--accent);
-  text-transform:uppercase;letter-spacing:.08em;
-}
-.chat-header-sub{font-size:11px;color:var(--text3);margin-top:1px}
-.chat-close{
-  background:none;border:none;color:var(--text3);
-  font-size:18px;cursor:pointer;padding:4px;line-height:1;
-  border-radius:4px;transition:color .15s;
-}
-.chat-close:hover{color:var(--text)}
-.chat-messages{
-  flex:1;overflow-y:auto;padding:14px 16px;
-  display:flex;flex-direction:column;gap:14px;
-  scroll-behavior:smooth;
-}
-.chat-msg{display:flex;flex-direction:column;gap:4px;max-width:100%}
-.chat-msg-user{align-items:flex-end}
-.chat-msg-ai{align-items:flex-start}
-.chat-bubble{
-  padding:10px 14px;border-radius:14px;
-  font-size:13px;line-height:1.6;max-width:88%;
-}
-.chat-bubble-user{
-  background:var(--accent);color:#0d2e2b;
-  border-bottom-right-radius:4px;font-weight:500;
-}
-.chat-bubble-ai{
-  background:var(--bg3);color:var(--text);
-  border-bottom-left-radius:4px;border:1px solid var(--border);
-}
-.chat-bubble-ai p{margin-bottom:6px}
-.chat-bubble-ai p:last-child{margin-bottom:0}
-.chat-bubble-ai strong{color:var(--accent)}
-.chat-suggestions{
-  display:flex;flex-direction:column;gap:6px;margin-top:6px;
-}
-.chat-suggestion{
-  background:none;border:1px solid var(--border2);
-  color:var(--text2);font-family:var(--font);font-size:12px;
-  padding:7px 12px;border-radius:8px;cursor:pointer;
-  text-align:left;transition:all .15s;line-height:1.4;
-}
-.chat-suggestion:hover{border-color:var(--accent);color:var(--accent);background:rgba(79,209,197,0.05)}
-.chat-input-wrap{
-  padding:12px 14px;border-top:1px solid var(--border);
-  display:flex;gap:8px;align-items:flex-end;flex-shrink:0;
-  padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));
-}
-.chat-input{
-  flex:1;background:var(--bg3);border:1px solid var(--border2);
-  color:var(--text);font-family:var(--font);font-size:13px;
-  padding:9px 12px;border-radius:10px;resize:none;
-  outline:none;line-height:1.4;max-height:100px;
-  transition:border-color .15s;
-}
-.chat-input:focus{border-color:var(--accent)}
-.chat-input::placeholder{color:var(--text3)}
-.chat-send{
-  background:var(--accent);border:none;color:#0d2e2b;
-  width:36px;height:36px;border-radius:9px;cursor:pointer;
-  font-size:16px;display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;transition:opacity .15s;font-weight:700;
-  align-self:flex-end;margin-bottom:1px;
-}
-.chat-send:disabled{opacity:.4;cursor:not-allowed}
-.chat-empty{
-  flex:1;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;text-align:center;padding:20px;gap:12px;
-}
-.chat-empty-icon{font-size:32px}
-.chat-empty-title{font-size:14px;font-weight:500;color:var(--text)}
-.chat-empty-sub{font-size:12px;color:var(--text3);line-height:1.6}
-.chat-starters{display:flex;flex-direction:column;gap:7px;width:100%;margin-top:6px}
-.chat-starter{
-  background:var(--bg3);border:1px solid var(--border);
-  color:var(--text2);font-size:12px;font-family:var(--font);
-  padding:9px 14px;border-radius:9px;cursor:pointer;
-  text-align:left;transition:all .15s;line-height:1.4;
-}
-.chat-starter:hover{border-color:var(--accent);color:var(--accent)}
-.chat-typing{display:flex;align-items:center;gap:3px;padding:4px 0}
-.chat-typing span{
-  width:6px;height:6px;border-radius:50%;
-  background:var(--text3);animation:typingDot 1.2s infinite;
-}
-.chat-typing span:nth-child(2){animation-delay:.2s}
-.chat-typing span:nth-child(3){animation-delay:.4s}
-@keyframes typingDot{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-4px);opacity:1}}
-
 /* STREAMING CURSOR */
 .ai-cursor{display:inline-block;width:2px;height:1em;background:var(--accent);margin-left:2px;vertical-align:text-bottom;animation:blink-cur .7s step-end infinite}
 @keyframes blink-cur{0%,100%{opacity:1}50%{opacity:0}}
@@ -489,8 +329,8 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
 /* CHART MODAL */
 .chart-expand-btn{position:absolute;top:10px;right:10px;background:var(--bg3);border:1px solid var(--border2);color:var(--text3);width:24px;height:24px;border-radius:4px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s;z-index:2;line-height:1}
 .chart-wrap:hover .chart-expand-btn{opacity:1}
-.chart-wrap{position:relative}
-.chart-wrap canvas{touch-action:pan-y}
+.chart-wrap{position:relative;overscroll-behavior:contain}
+.chart-wrap canvas{touch-action:pan-y;overscroll-behavior:contain}
 .chart-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center;padding:20px;touch-action:none;overscroll-behavior:contain}
 .chart-modal-overlay.open{display:flex}
 .chart-modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);padding:20px;width:100%;max-width:1100px;max-height:90vh;display:flex;flex-direction:column;gap:12px}
@@ -499,6 +339,102 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
 .chart-modal-close{background:none;border:1px solid var(--border2);color:var(--text2);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center}
 .chart-modal-close:hover{border-color:var(--accent);color:var(--accent)}
 .chart-modal-body{position:relative;flex:1;min-height:500px}
+
+/* ── FLOATING CHAT ───────────────────────────────────────────────────────── */
+.chat-fab{
+  position:fixed;bottom:80px;right:18px;z-index:200;
+  width:52px;height:52px;border-radius:50%;
+  background:var(--accent);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;box-shadow:0 4px 20px rgba(79,209,197,0.4);
+  transition:transform .2s,box-shadow .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.chat-fab:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(79,209,197,0.55)}
+.chat-fab.open{background:var(--bg3);box-shadow:0 2px 12px rgba(0,0,0,0.3)}
+@media(min-width:769px){.chat-fab{bottom:24px;right:24px}}
+.chat-panel{
+  position:fixed;bottom:0;right:0;z-index:199;
+  width:100%;max-width:420px;height:70vh;max-height:580px;
+  background:var(--bg2);border:1px solid var(--border2);
+  border-radius:20px 20px 0 0;
+  display:flex;flex-direction:column;
+  transform:translateY(110%);
+  transition:transform .32s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 -8px 40px rgba(0,0,0,0.25);
+  touch-action:none;overscroll-behavior:contain;
+}
+.chat-panel.open{transform:translateY(0)}
+@media(min-width:769px){
+  .chat-panel{bottom:84px;right:24px;border-radius:16px;height:500px;max-height:500px}
+}
+@media(max-width:768px){
+  .chat-panel{height:82vh;border-radius:24px 24px 0 0}
+}
+
+/* ── ASK TAB ─────────────────────────────────────────────────────────────── */
+.chat-tab-wrap{
+  display:flex;flex-direction:column;
+  height:calc(100vh - 160px);
+  max-height:820px;
+  min-height:400px;
+}
+.chat-tab-header{padding:4px 0 14px;flex-shrink:0}
+.chat-tab-messages{
+  flex:1;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  padding:0 0 8px;
+}
+.chat-tab-input{
+  flex-shrink:0;padding:12px 0 0;
+  border-top:1px solid var(--border);
+}
+@media(max-width:768px){
+  .chat-tab-wrap{
+    height:calc(100vh - 128px - env(safe-area-inset-bottom,0px));
+    max-height:none;
+  }
+}
+
+/* ── WEEKLY DIGEST ───────────────────────────────────────────────────────── */
+.week-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);margin-bottom:20px;overflow:hidden}
+.week-card-header{padding:16px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:baseline;gap:12px;justify-content:space-between}
+.week-card-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em}
+.week-card-title{font-size:15px;font-weight:500;color:var(--text)}
+.week-card-body{padding:18px 20px}
+.week-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-bottom:16px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.week-metric{padding:14px 12px;text-align:center;border-right:1px solid var(--border)}
+.week-metric:last-child{border-right:none}
+.week-metric-val{font-size:20px;font-weight:300;color:var(--text);line-height:1.1;margin-bottom:3px}
+.week-metric-val span{font-size:12px;color:var(--text2)}
+.week-metric-chg{font-family:var(--mono);font-size:10px;margin-bottom:3px;padding:2px 6px;border-radius:3px;display:inline-block}
+.week-metric-chg.up{background:var(--badge-ok-bg);color:var(--badge-ok-text)}
+.week-metric-chg.dn{background:var(--badge-danger-bg);color:var(--badge-danger-text)}
+.week-metric-chg.inv-up{background:var(--badge-danger-bg);color:var(--badge-danger-text)}
+.week-metric-chg.inv-dn{background:var(--badge-ok-bg);color:var(--badge-ok-text)}
+.week-metric-chg.neu{color:var(--text3)}
+.week-metric-label{font-size:11px;color:var(--text3)}
+.week-highlights{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.week-highlight{background:var(--bg3);border-radius:var(--r);padding:12px 14px;border:1px solid var(--border)}
+.week-highlight-icon{font-size:16px;margin-bottom:4px}
+.week-highlight-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.week-highlight-val{font-size:12px;font-weight:500;color:var(--text);line-height:1.4}
+.week-ai{background:var(--bg3);border-radius:var(--r);padding:14px 16px;font-size:13px;color:var(--text2);line-height:1.7;border-left:3px solid var(--accent);min-height:48px}
+.week-ai.loading{color:var(--text3)}
+.week-ai p{margin-bottom:6px}
+.week-ai p:last-child{margin-bottom:0}
+.week-ai strong{color:var(--text)}
+.week-divider{display:flex;align-items:center;gap:10px;margin:24px 0 16px;font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em}
+.week-divider::before,.week-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.week-empty{text-align:center;padding:60px 20px;color:var(--text3)}
+.week-empty-icon{font-size:36px;margin-bottom:12px}
+@media(max-width:768px){
+  .week-metrics{grid-template-columns:repeat(3,1fr)}
+  .week-highlights{grid-template-columns:1fr 1fr}
+  .week-card-body{padding:14px 16px}
+}
+
 </style>
 </head>
 <body>
@@ -515,6 +451,9 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
       <button class="nav-btn" onclick="showView('sleep')">Sleep</button>
       <button class="nav-btn" onclick="showView('activity')">Activity</button>
       <button class="nav-btn" onclick="showView('insights')">Insights</button>
+      <button class="nav-btn" onclick="showView('week')">Week</button>
+      <div style="width:1px;height:20px;background:var(--border2);margin:0 4px;align-self:center"></div>
+      <button class="nav-btn" onclick="showView('ask')" style="border-color:var(--accent);color:var(--accent)">✦ Ask AI</button>
       <button class="nav-btn" onclick="showView('upload')">Upload Data</button>
       <button class="refresh-btn" id="refreshBtn" onclick="refreshAll()" title="Refresh all charts and data"><span class="refresh-icon">↺</span> Refresh</button>
       <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode">🌙</button>
@@ -537,18 +476,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
         </div>
         <span class="tf-label" id="tf-label-overview"></span>
       </div>
-      <div class="ai-panel">
-        <div class="ai-panel-header" onclick="toggleAIPanel('overview')" style="cursor:pointer">
-          <div class="ai-panel-title"><div class="ai-dot"></div>AI Analysis</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <button class="ai-inner-refresh" id="ai-inner-overview" onclick="event.stopPropagation();refreshAI('overview')" title="Generate fresh analysis">↺</button>
-            <button class="ai-refresh" id="ai-btn-overview" onclick="event.stopPropagation();generateAI('overview')">Generate ↗</button>
-            <span id="ai-chevron-overview" style="color:var(--text3);font-size:12px;transition:transform .2s;display:inline-block">▾</span>
-          </div>
-        </div>
-        <div class="ai-body" id="ai-body-overview"><span style="color:var(--text3);font-size:12px">Click Generate for an AI summary of your overall health data.</span></div>
-      </div>
-      <div class="overview-grid" id="ov-cards"></div>
+            <div class="overview-grid" id="ov-cards"></div>
       <div class="section">
         <div class="section-header"><span class="section-title">30-day trend</span><span class="section-sub">steps · resting HR · sleep duration</span></div>
         <div class="chart-wrap">
@@ -575,18 +503,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
         </div>
         <span class="tf-label" id="tf-label-heartrate"></span>
       </div>
-      <div class="ai-panel">
-        <div class="ai-panel-header" onclick="toggleAIPanel('heartrate')" style="cursor:pointer">
-          <div class="ai-panel-title"><div class="ai-dot"></div>AI Analysis — Heart Rate</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <button class="ai-inner-refresh" id="ai-inner-heartrate" onclick="event.stopPropagation();refreshAI('heartrate')" title="Generate fresh analysis">↺</button>
-            <button class="ai-refresh" id="ai-btn-heartrate" onclick="event.stopPropagation();generateAI('heartrate')">Generate ↗</button>
-            <span id="ai-chevron-heartrate" style="color:var(--text3);font-size:12px;transition:transform .2s;display:inline-block">▾</span>
-          </div>
-        </div>
-        <div class="ai-body" id="ai-body-heartrate"><span style="color:var(--text3);font-size:12px">Click Generate for AI commentary on your heart rate patterns.</span></div>
-      </div>
-      <div class="metric-row" id="hr-metrics"></div>
+            <div class="metric-row" id="hr-metrics"></div>
       <div class="section">
         <div class="section-header"><span class="section-title">Daily mean & resting HR</span></div>
         <div class="chart-wrap">
@@ -650,18 +567,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
         </div>
         <span class="tf-label" id="tf-label-sleep"></span>
       </div>
-      <div class="ai-panel">
-        <div class="ai-panel-header" onclick="toggleAIPanel('sleep')" style="cursor:pointer">
-          <div class="ai-panel-title"><div class="ai-dot"></div>AI Analysis — Sleep</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <button class="ai-inner-refresh" id="ai-inner-sleep" onclick="event.stopPropagation();refreshAI('sleep')" title="Generate fresh analysis">↺</button>
-            <button class="ai-refresh" id="ai-btn-sleep" onclick="event.stopPropagation();generateAI('sleep')">Generate ↗</button>
-            <span id="ai-chevron-sleep" style="color:var(--text3);font-size:12px;transition:transform .2s;display:inline-block">▾</span>
-          </div>
-        </div>
-        <div class="ai-body" id="ai-body-sleep"><span style="color:var(--text3);font-size:12px">Click Generate for AI commentary on your sleep quality and patterns.</span></div>
-      </div>
-      <div class="metric-row" id="sleep-metrics"></div>
+            <div class="metric-row" id="sleep-metrics"></div>
       <div class="section">
         <div class="section-header"><span class="section-title">Nightly sleep duration</span></div>
         <div class="chart-wrap">
@@ -713,18 +619,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
         </div>
         <span class="tf-label" id="tf-label-activity"></span>
       </div>
-      <div class="ai-panel">
-        <div class="ai-panel-header" onclick="toggleAIPanel('activity')" style="cursor:pointer">
-          <div class="ai-panel-title"><div class="ai-dot"></div>AI Analysis — Activity</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <button class="ai-inner-refresh" id="ai-inner-activity" onclick="event.stopPropagation();refreshAI('activity')" title="Generate fresh analysis">↺</button>
-            <button class="ai-refresh" id="ai-btn-activity" onclick="event.stopPropagation();generateAI('activity')">Generate ↗</button>
-            <span id="ai-chevron-activity" style="color:var(--text3);font-size:12px;transition:transform .2s;display:inline-block">▾</span>
-          </div>
-        </div>
-        <div class="ai-body" id="ai-body-activity"><span style="color:var(--text3);font-size:12px">Click Generate for AI commentary on your activity and movement patterns.</span></div>
-      </div>
-      <div class="metric-row" id="act-metrics"></div>
+            <div class="metric-row" id="act-metrics"></div>
       <div class="section">
         <div class="section-header"><span class="section-title">Daily steps with 7-day rolling average</span></div>
         <div class="chart-wrap">
@@ -776,18 +671,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
         </div>
         <span class="tf-label" id="tf-label-insights"></span>
       </div>
-      <div class="ai-panel">
-        <div class="ai-panel-header" onclick="toggleAIPanel('insights')" style="cursor:pointer">
-          <div class="ai-panel-title"><div class="ai-dot"></div>AI Analysis — Insights</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <button class="ai-inner-refresh" id="ai-inner-insights" onclick="event.stopPropagation();refreshAI('insights')" title="Generate fresh analysis">↺</button>
-            <button class="ai-refresh" id="ai-btn-insights" onclick="event.stopPropagation();generateAI('insights')">Generate ↗</button>
-            <span id="ai-chevron-insights" style="color:var(--text3);font-size:12px;transition:transform .2s;display:inline-block">▾</span>
-          </div>
-        </div>
-        <div class="ai-body" id="ai-body-insights"><span style="color:var(--text3);font-size:12px">Click Generate for AI commentary on your cross-dataset patterns.</span></div>
-      </div>
-
+      
       <!-- SLEEP DEBT -->
       <div class="section">
         <div class="section-header">
@@ -864,7 +748,16 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
       </div>
 
     </div>
-<div class="view" id="view-upload">
+<div class="view" id="view-week">
+      <div style="padding:4px 0 20px">
+        <div style="font-size:22px;font-weight:300;color:var(--text);margin-bottom:4px">Weekly Digest</div>
+        <div style="font-size:13px;color:var(--text3)">Your week in numbers — auto-generated from your data</div>
+      </div>
+      <div id="week-digest-container"></div>
+    </div>
+
+    <!-- ASK AI TAB -->
+    <div class="view" id="view-upload">
       <!-- CLOUD SYNC CONFIG -->
       <div class="sb-panel" id="sbPanel">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:4px">
@@ -949,9 +842,45 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
     </div>
 
 
-    </div><!-- /view-track -->
+
+    <!-- WEEK DIGEST -->
+        </div><!-- /view-track -->
   </div><!-- /swipe-clip -->
-  </main>
+  
+<!-- ASK AI FULL VIEW (overlay, not in swipe track) -->
+<div id="view-ask" style="display:none;position:fixed;inset:0;z-index:190;background:var(--bg);overflow-y:auto;padding:20px 20px calc(80px + env(safe-area-inset-bottom,0px))">
+  <div style="max-width:1400px;margin:0 auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)">
+      <div>
+        <div style="font-size:18px;font-weight:500;color:var(--text)">✦ Ask your data</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px">Powered by Groq · answers from your actual numbers only</div>
+      </div>
+      <button onclick="closeAskView()" style="background:none;border:1px solid var(--border2);color:var(--text2);padding:6px 14px;border-radius:6px;cursor:pointer;font-family:var(--font);font-size:13px">← Back</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0;max-width:720px;margin:0 auto">
+      <div class="chat-messages" id="chatMessagesExpanded" style="min-height:400px;max-height:60vh;overflow-y:auto;overscroll-behavior:contain;padding:0 0 16px;-webkit-overflow-scrolling:touch">
+        <div class="chat-empty" id="chatEmptyExpanded">
+          <div class="chat-empty-icon">🔍</div>
+          <div class="chat-empty-title">Ask anything about your health data</div>
+          <div class="chat-empty-sub">Questions answered using only your actual numbers.</div>
+          <div class="chat-starters">
+            <button class="chat-starter" onclick="sendExpandedChatMessage('When do I sleep best?')">When do I sleep best?</button>
+            <button class="chat-starter" onclick="sendExpandedChatMessage('Is my fitness improving?')">Is my fitness improving?</button>
+            <button class="chat-starter" onclick="sendExpandedChatMessage('What were my most active days?')">What were my most active days?</button>
+            <button class="chat-starter" onclick="sendExpandedChatMessage('How does my training affect my sleep?')">How does my training affect my sleep?</button>
+          </div>
+        </div>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:12px;display:flex;gap:8px;align-items:flex-end">
+        <textarea class="chat-input" id="chatInputExpanded" placeholder="Ask about your data…" rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendExpandedFromInput()}"
+          oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+        <button class="chat-send" id="chatSendExpanded" onclick="sendExpandedFromInput()">↑</button>
+      </div>
+    </div>
+  </div>
+</div>
+</main>
 
 <nav class="bottom-nav" id="bottomNav">
   <button class="bottom-nav-btn active" onclick="showView('overview')" data-view="overview">
@@ -963,17 +892,15 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
   <button class="bottom-nav-btn" onclick="showView('sleep')" data-view="sleep">
     <span class="tab-icon">🛌</span>Sleep
   </button>
-  <!-- Centre chat action button -->
-  <div class="bottom-nav-centre">
-    <button class="bottom-nav-chat" onclick="toggleChat()" id="bottomChatBtn" title="Ask your data">
-      <span style="font-size:26px;line-height:1">💬</span>
-    </button>
-  </div>
+
   <button class="bottom-nav-btn" onclick="showView('activity')" data-view="activity">
     <span class="tab-icon">🏃</span>Activity
   </button>
   <button class="bottom-nav-btn" onclick="showView('insights')" data-view="insights">
     <span class="tab-icon">💡</span>Insights
+  </button>
+  <button class="bottom-nav-btn" onclick="showView('week')" data-view="week">
+    <span class="tab-icon">📋</span>Week
   </button>
   <button class="bottom-nav-btn" onclick="showView('upload')" data-view="upload">
     <span class="tab-icon">⬆️</span>Upload
@@ -995,30 +922,33 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
   </div>
 </div>
 
-<!-- ── ASK AI CHAT ─────────────────────────────────────────────────────── -->
+
+<!-- FLOATING CHAT -->
 <button class="chat-fab" id="chatFab" onclick="toggleChat()" title="Ask about your data">💬</button>
 
 <div class="chat-panel" id="chatPanel">
   <div class="chat-header">
     <div>
       <div class="chat-header-title"><span>✦</span> Ask your data</div>
-      <div class="chat-header-sub">Answers based on your actual numbers</div>
+      <div class="chat-header-sub">Answers from your actual numbers</div>
     </div>
-    <button class="chat-close" onclick="toggleChat()">✕</button>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button onclick="openAskView()" title="Open full view" style="background:none;border:1px solid var(--border2);color:var(--text2);font-size:12px;padding:4px 10px;border-radius:5px;cursor:pointer;white-space:nowrap;font-family:var(--font)">⤢ Expand</button>
+      <button class="chat-close" onclick="toggleChat()">✕</button>
+    </div>
   </div>
   <div class="chat-messages" id="chatMessages">
     <div class="chat-empty" id="chatEmpty">
       <div class="chat-empty-icon">🔍</div>
-      <div class="chat-empty-title">Ask anything about your health data</div>
-      <div class="chat-empty-sub">Questions are answered using only your actual numbers — no generic advice.</div>
+      <div class="chat-empty-title">Ask anything about your data</div>
+      <div class="chat-empty-sub">Tap ⤢ Expand for a bigger view.</div>
+      <div id="chatKeyWarning" style="display:none;font-size:11px;color:var(--accent3);background:var(--bg3);border:1px solid var(--accent3);border-radius:6px;padding:8px 12px;margin-bottom:4px">
+        ⚠ Add your Groq API key in Upload → AI Chat Settings.
+      </div>
       <div class="chat-starters">
-        <div id="chatKeyWarning" style="display:none;font-size:11px;color:var(--accent3);background:var(--bg3);border:1px solid var(--accent3);border-radius:6px;padding:8px 12px;margin-bottom:4px">
-          ⚠ Add your free Groq API key in <strong>Upload → AI Chat Settings</strong> for real AI answers.
-        </div>
         <button class="chat-starter" onclick="sendChatMessage('When do I sleep best?')">When do I sleep best?</button>
         <button class="chat-starter" onclick="sendChatMessage('Is my fitness improving?')">Is my fitness improving?</button>
         <button class="chat-starter" onclick="sendChatMessage('What were my most active days?')">What were my most active days?</button>
-        <button class="chat-starter" onclick="sendChatMessage('How does my training affect my sleep?')">How does my training affect my sleep?</button>
       </div>
     </div>
   </div>
@@ -1862,237 +1792,9 @@ async function clearAllData() {
   showToast('Data reset to seed');
 }
 
-// ─── AI COMMENTARY ────────────────────────────────────────────────────────────
-
-// ─── TEXT STREAMING ───────────────────────────────────────────────────────────
-function streamText(el, html, onDone) {
-  const div = document.createElement('div');
-  div.innerHTML = html;
-  const paragraphs = Array.from(div.querySelectorAll('p')).map(p => p.innerHTML);
-  el.innerHTML = '';
-  let pIdx = 0, wordIdx = 0, words = [];
-  const DELAY = 18;
-  let cursor = null;
-
-  function ensureCursor(pEl) {
-    if (cursor && cursor.parentNode) cursor.parentNode.removeChild(cursor);
-    cursor = document.createElement('span');
-    cursor.className = 'ai-cursor';
-    pEl.appendChild(cursor);
-  }
-  function removeCursor() {
-    if (cursor && cursor.parentNode) cursor.parentNode.removeChild(cursor);
-    cursor = null;
-  }
-
-  function nextPara() {
-    if (pIdx >= paragraphs.length) { removeCursor(); if (onDone) onDone(); return; }
-    words = tokenise(paragraphs[pIdx]);
-    wordIdx = 0;
-    const pEl = document.createElement('p');
-    el.appendChild(pEl);
-    ensureCursor(pEl);
-    nextWord(pEl);
-  }
-
-  function nextWord(pEl) {
-    if (wordIdx >= words.length) {
-      removeCursor(); pIdx++;
-      setTimeout(nextPara, 120); return;
-    }
-    const token = words[wordIdx++];
-    if (cursor && cursor.parentNode === pEl) {
-      cursor.insertAdjacentHTML('beforebegin', token);
-    } else {
-      pEl.innerHTML += token;
-    }
-    ensureCursor(pEl);
-    setTimeout(() => nextWord(pEl), token.startsWith('<') ? 0 : DELAY);
-  }
-  nextPara();
-}
-
-function tokenise(html) {
-  const tokens = [];
-  const re = /(<[^>]+>)|([^<\s]+)|\s+/g;
-  let m;
-  while ((m = re.exec(html)) !== null) {
-    if (m[1]) tokens.push(m[1]);
-    else if (m[2]) tokens.push(m[2] + ' ');
-  }
-  return tokens;
-}
-
-// ─── AI COLLAPSE ──────────────────────────────────────────────────────────────
-const AI_COLLAPSED = {};
-function toggleAIPanel(tab) {
-  AI_COLLAPSED[tab] = !AI_COLLAPSED[tab];
-  const body = document.getElementById('ai-body-' + tab);
-  const chev = document.getElementById('ai-chevron-' + tab);
-  if (body) body.style.display = AI_COLLAPSED[tab] ? 'none' : '';
-  if (chev) chev.style.transform = AI_COLLAPSED[tab] ? 'rotate(-90deg)' : '';
-}
 
 // ─── AI GENERATION ────────────────────────────────────────────────────────────
-const AI_CACHE = {};
 const AI_LAST_IDX = {}; // track last pool index per tab to avoid repeats
-
-function generateAI(tab) {
-  const bodyEl = document.getElementById('ai-body-' + tab);
-  const btnEl  = document.getElementById('ai-btn-' + tab);
-  if (!bodyEl) return;
-  // Expand if collapsed
-  if (AI_COLLAPSED[tab]) toggleAIPanel(tab);
-  bodyEl.style.display = '';
-  bodyEl.innerHTML = `<div class="ai-loading">Analysing data<div class="ai-loading-dots"><span>.</span><span>.</span><span>.</span></div></div>`;
-  btnEl.disabled = true; btnEl.textContent = 'Generating…';
-  setTimeout(() => {
-    const html = generateLocalAI(tab);
-    streamText(bodyEl, html, () => {
-      AI_CACHE[tab] = bodyEl.innerHTML.replace(/<span class="ai-cursor"><\/span>/g,'');
-      btnEl.disabled = false;
-      btnEl.textContent = 'Refresh ↗';
-    });
-  }, 80);
-}
-
-function refreshAI(tab) {
-  // Force different variant by invalidating cache
-  delete AI_CACHE[tab];
-  const btn = document.getElementById('ai-inner-' + tab);
-  if (btn) btn.classList.add('spinning');
-  generateAI(tab);
-  setTimeout(() => { if (btn) btn.classList.remove('spinning'); }, 800);
-}
-
-// ─── AI COMMENTARY GENERATION ────────────────────────────────────────────────
-function generateLocalAI(tab) {
-  // Use timeframe-filtered data for the current view
-  const hr  = filterByTF(STATE.hr_daily||[], tab==='insights'?'insights':tab==='heartrate'?'heartrate':'overview');
-  const sl  = filterByTF(STATE.sleep||[], tab==='sleep'||tab==='insights'?tab:'overview').filter(s=>s.total_min>=120);
-  const am  = filterByTF(STATE.am_daily||[], tab==='activity'||tab==='insights'?tab:'overview');
-  const ast = filterByTF(STATE.ast_daily||[], tab==='activity'||tab==='insights'?tab:'overview');
-
-  const avgRestHR    = hr.length ? Math.round(avg(hr.map(r=>r.resting))) : null;
-  const avgMeanHR    = hr.length ? Math.round(avg(hr.map(r=>r.mean))) : null;
-  const anomalyCount = hr.filter(r=>r.max>160).length;
-  const maxHR        = hr.length ? Math.max(...hr.map(r=>r.max)) : null;
-  const minRestHR    = hr.length ? Math.min(...hr.map(r=>r.resting)) : null;
-  const avgSleepHrs  = sl.length ? +avg(sl.map(s=>s.total_min/60)).toFixed(1) : null;
-  const avgDeep      = sl.length ? Math.round(avg(sl.map(s=>s.deep))) : null;
-  const avgRem       = sl.length ? Math.round(avg(sl.map(s=>s.rem))) : null;
-  const avgEff       = sl.length ? +avg(sl.map(s=>s.efficiency)).toFixed(1) : null;
-  const amSorted     = [...am].sort((a,b)=>a.date.localeCompare(b.date));
-  const rolling7     = amSorted.map((r,i)=>{ const w=amSorted.slice(Math.max(0,i-6),i+1); return Math.round(avg(w.map(x=>x.steps))); });
-  const latestRoll   = rolling7[rolling7.length-1]||0;
-  const firstRoll    = rolling7[0]||0;
-  const rollMultiple = firstRoll > 0 ? (latestRoll/firstRoll).toFixed(1) : '—';
-  const avgSteps     = am.length ? Math.round(avg(am.map(r=>r.steps))) : null;
-  const maxSteps     = am.length ? Math.max(...am.map(r=>r.steps)) : null;
-  const maxStepsDay  = am.find(r=>r.steps===maxSteps);
-  const totalDist    = +ast.reduce((a,b)=>a+(b.dist_km||0),0).toFixed(1);
-  const totalCals    = ast.reduce((a,b)=>a+(b.cals||0),0);
-  const lowSleepN    = sl.filter(s=>s.total_min/60<6).length;
-  const highSleepN   = sl.filter(s=>s.total_min/60>9).length;
-  const bestSleep    = sl.length ? sl.reduce((a,b)=>a.deep>b.deep?a:b) : null;
-  const avgWake      = sl.length ? Math.round(avg(sl.map(s=>s.wake))) : null;
-  const highCalDays  = ast.filter(r=>r.cals>400);
-  const daysAbove10k = am.filter(r=>r.steps>=10000).length;
-  const hrSorted     = [...hr].sort((a,b)=>a.date.localeCompare(b.date));
-  const rhrTrend     = hrSorted.length > 3 ? hrSorted[hrSorted.length-1].resting - hrSorted[0].resting : 0;
-  const days         = hr.length || am.length || sl.length;
-  const tfDays       = TF[tab] || TF['overview'] || 0;
-  const tfLabel      = tfDays === -1 ? 'all available data' : tfDays === 0 ? 'the last 30 days' : `the last ${tfDays} day${tfDays===1?'':'s'}`;
-
-  // Pick a random pool variant, avoiding last shown
-  function pickVariant(poolArr) {
-    const lastIdx = AI_LAST_IDX[tab] ?? -1;
-    let idx;
-    if (poolArr.length <= 1) { idx = 0; }
-    else {
-      do { idx = Math.floor(Math.random() * poolArr.length); } while (idx === lastIdx);
-    }
-    AI_LAST_IDX[tab] = idx;
-    return poolArr[idx];
-  }
-
-  const pools = {
-    overview: [
-      [
-        `Looking at ${tfLabel}, your resting HR is <strong>${avgRestHR??'—'} bpm</strong> — a healthy aerobic baseline. Sleep efficiency of <strong>${avgEff??'—'}%</strong> and deep sleep averaging <strong>${avgDeep??'—'} min</strong> per night means recovery quality is solid.`,
-        `Activity tells the clearest story: your 7-day rolling step average ${firstRoll !== latestRoll ? `climbed from <strong>${firstRoll.toLocaleString()}</strong> to <strong>${latestRoll.toLocaleString()}</strong>` : `is holding at <strong>${latestRoll.toLocaleString()}</strong>`} across this window. ${daysAbove10k > 0 ? `<strong>${daysAbove10k}</strong> days hit the 10k mark.` : 'The 10k daily goal is within reach most days.'}`,
-        `${anomalyCount > 0 ? `The <strong>${anomalyCount} HR spike day${anomalyCount>1?'s':''}</strong> (peak above 160 bpm) correspond to your hardest effort sessions — daily means on those days were normal, confirming discrete intensity rather than sustained elevation.` : 'No HR anomaly days in this window — either a recovery period or consistently measured effort.'}`,
-        `The numbers are pointing in the same direction: ${rhrTrend <= 0 ? 'resting HR trending down' : 'load increasing'}, sleep quality consistent, and activity volume rising. The key variable to watch is whether resting HR stays stable as training load grows.`
-      ],
-      [
-        `Over ${tfLabel}: <strong>${days}</strong> days of data, resting HR <strong>${avgRestHR??'—'} bpm</strong>, avg sleep <strong>${avgSleepHrs??'—'} hrs</strong>, daily steps averaging <strong>${avgSteps?.toLocaleString()??'—'}</strong>. All three metrics in healthy range for the period.`,
-        `Sleep is the quiet strength here. <strong>${avgDeep??'—'} min deep</strong> and <strong>${avgRem??'—'} min REM</strong> nightly means both physical and cognitive recovery are being served. ${lowSleepN > 0 ? `The <strong>${lowSleepN} short night${lowSleepN>1?'s':''}</strong> under 6 hours warrant attention — they typically follow or precede the highest-intensity days.` : 'No significantly short nights in this window.'}`,
-        `Distance of <strong>${totalDist} km</strong> and <strong>${totalCals.toLocaleString()} kcal</strong> from tracked sessions. The calorie-intensive days cluster around the HR anomaly dates — confirmation those sessions were genuinely high-output.`,
-        `Resting HR trend of <strong>${rhrTrend > 0 ? '+' : ''}${rhrTrend.toFixed(1)} bpm</strong> across this window is ${rhrTrend <= -1 ? 'a clear positive adaptation signal' : rhrTrend <= 1 ? 'essentially flat — load and recovery are balanced' : 'worth watching as training volume increases'}.`
-      ]
-    ],
-    heartrate: [
-      [
-        `Over ${tfLabel}: avg resting HR <strong>${avgRestHR??'—'} bpm</strong>, avg overall mean <strong>${avgMeanHR??'—'} bpm</strong>. The gap between resting and mean reflects how much activity is pulling the average up — a wider gap typically means more high-effort minutes.`,
-        `${anomalyCount > 0 ? `<strong>${anomalyCount} peak day${anomalyCount>1?'s':''}</strong> exceeded 160 bpm (highest: <strong>${maxHR} bpm</strong>). Daily means on those days were unremarkable, meaning these were brief, intense spikes — exactly what structured training produces.` : 'No HR peaks above 160 bpm in this window — likely a recovery or lower-intensity period.'}`,
-        `Resting HR range this period: <strong>${minRestHR??'—'}–${hr.length?Math.max(...hr.map(r=>r.resting)):'—'} bpm</strong>. Day-to-day variation within a few bpm is normal. Sustained rises of 5+ bpm above your personal baseline over 2–3 consecutive days are the signal to watch for fatigue.`,
-        `The hourly HR pattern peaks in the evening — typical for people who train later in the day. Elevated HR close to sleep onset delays deep sleep onset. If sleep quality ever dips, shifting training earlier by 1–2 hours is the highest-leverage intervention.`
-      ],
-      [
-        `Resting HR over ${tfLabel}: <strong>${avgRestHR??'—'} bpm</strong> average, trending <strong>${rhrTrend <= 0 ? 'down ' + Math.abs(rhrTrend).toFixed(1) + ' bpm' : 'up ' + rhrTrend.toFixed(1) + ' bpm'}</strong>. ${rhrTrend <= 0 ? 'A falling resting HR is the clearest single-number indicator of improving cardiovascular fitness.' : 'A rising trend alongside increased load can be an early fatigue signal — worth monitoring.'}`,
-        `HR zone distribution this window shows the balance between base aerobic work and high-intensity efforts. The current mix — mostly below 100 bpm with targeted spikes — aligns with what progressive training models recommend.`,
-        `With a lowest recorded resting value of <strong>${minRestHR??'—'} bpm</strong> and <strong>${anomalyCount}</strong> high-intensity spike day${anomalyCount===1?'':'s'}, the data suggests a system that's both capable of high output and recovering adequately between efforts.`,
-        `${anomalyCount > 1 ? `The ${anomalyCount} spike days are spread across the window rather than clustered — spacing hard efforts with recovery days between them is optimal for adaptation.` : 'Consistent moderate HR with the occasional hard effort is a sustainable training pattern.'}`
-      ]
-    ],
-    sleep: [
-      [
-        `Sleep over ${tfLabel}: <strong>${avgSleepHrs??'—'} hrs</strong> average across <strong>${sl.length}</strong> nights, efficiency <strong>${avgEff??'—'}%</strong>. Duration is ${avgSleepHrs >= 7 ? 'above the recommended minimum' : 'slightly below the 7-hour threshold — worth prioritising'}.`,
-        `Deep sleep averaging <strong>${avgDeep??'—'} min</strong> is ${avgDeep >= 90 ? 'at or above the 90-minute threshold associated with adequate physical recovery — the stage where growth hormone is released and tissue repair occurs' : 'below the 90-minute target. Light sleep and late nights are the most common culprits'}.`,
-        `REM at <strong>${avgRem??'—'} min</strong> per night covers cognitive and emotional recovery. ${highSleepN > 0 ? `The <strong>${highSleepN}</strong> extended night${highSleepN>1?'s':''} over 9.5 hours in this window likely reflect recovery from hard training days — the body self-regulating.` : 'Duration consistency is good across this window.'}`,
-        `Sleep efficiency of <strong>${avgEff??'—'}%</strong> means ${avgEff >= 95 ? 'very little time lying awake — the body is using its time in bed productively' : 'some wakeful periods worth tracking. Waking HR and pre-sleep activity are the main variables to examine'}.`
-      ],
-      [
-        `Over ${tfLabel}, <strong>${lowSleepN}</strong> night${lowSleepN===1?'':'s'} fell below 6 hours. ${lowSleepN === 0 ? 'No significantly short nights — strong sleep consistency for this window.' : 'Even isolated short nights have measurable next-day effects on HRV, reaction time, and appetite regulation.'}`,
-        `Best deep-sleep night this period: ${bestSleep ? `<strong>${bestSleep.deep} min deep</strong> on ${bestSleep.label}` : '—'}. That's a useful reference for what optimal conditions look like — what was different about that day?`,
-        `Average wake time within sleep: <strong>${avgWake??'—'} min</strong>. ${avgWake <= 10 ? 'Very low — indicating strong sleep pressure and good sleep hygiene.' : avgWake <= 20 ? 'Moderate — a few brief awakenings is normal.' : 'Above average — worth examining pre-sleep habits and training timing.'}`,
-        `The sleep-HR picture across this window: nights with higher sleep HR tend to follow harder training days. This is the autonomic nervous system still processing load during what should be restoration time — normal, but worth watching if it becomes a consistent pattern.`
-      ]
-    ],
-    activity: [
-      [
-        `Activity over ${tfLabel}: <strong>${avgSteps?.toLocaleString()??'—'}</strong> avg steps/day, <strong>${totalDist} km</strong> distance, <strong>${totalCals.toLocaleString()} kcal</strong> active burn. ${daysAbove10k > 0 ? `<strong>${daysAbove10k}</strong> day${daysAbove10k>1?'s':''} above 10,000 steps.` : ''}`,
-        `7-day rolling average ${latestRoll !== firstRoll ? `moved from <strong>${firstRoll.toLocaleString()}</strong> to <strong>${latestRoll.toLocaleString()}</strong>` : `steady at <strong>${latestRoll.toLocaleString()}</strong>`} across this window — ${latestRoll >= 10000 ? 'above the 10k daily target' : latestRoll >= 7000 ? 'approaching the 10k goal' : 'building toward the 10k baseline'}.`,
-        `${maxSteps && maxStepsDay ? `Peak single day: <strong>${maxSteps.toLocaleString()}</strong> steps on ${maxStepsDay.date}. That ceiling shows what's possible — the question is making that level more routine.` : ''}${highCalDays.length > 0 ? ` <strong>${highCalDays.length}</strong> session${highCalDays.length>1?'s':''} burned over 400 active calories — these are your high-output training days.` : ''}`,
-        `The hourly step distribution shows movement concentrated in the afternoon and evening. Morning movement is the lowest-hanging fruit for increasing daily totals without restructuring your schedule.`
-      ],
-      [
-        `Over ${tfLabel}, total active distance: <strong>${totalDist} km</strong>, active calories: <strong>${totalCals.toLocaleString()}</strong>. ${totalDist > 20 ? 'Strong volume for the window.' : 'Building volume — consistent daily movement compounds quickly.'}`,
-        `Daily step average of <strong>${avgSteps?.toLocaleString()??'—'}</strong> for this period. ${avgSteps >= 10000 ? 'Above the 10k goal — excellent.' : avgSteps >= 7000 ? 'Within reach of the 10k goal most days.' : 'The 7-day rolling trend matters more than the average — direction counts.'}`,
-        `Rolling 7-day average is <strong>${latestRoll.toLocaleString()}</strong>. ${latestRoll > firstRoll ? `Up from <strong>${firstRoll.toLocaleString()}</strong> at the start of this window — positive momentum.` : latestRoll === firstRoll ? 'Holding steady — maintenance mode.' : `Down from <strong>${firstRoll.toLocaleString()}</strong> — check whether this reflects a planned recovery week.`}`,
-        `${highCalDays.length > 0 ? `The <strong>${highCalDays.length}</strong> high-calorie session${highCalDays.length>1?'s':''} (400+ kcal) in this window align with the HR spike days — confirming those efforts were genuinely high-output. The ratio of high-intensity to moderate activity looks sustainable.` : 'Activity this window has been moderate-intensity — a solid base-building pattern.'}`
-      ]
-    ],
-    insights: [
-      [
-        `Cross-dataset view over ${tfLabel}: resting HR <strong>${avgRestHR??'—'} bpm</strong>, sleep <strong>${avgSleepHrs??'—'} hrs</strong> avg, steps <strong>${avgSteps?.toLocaleString()??'—'}</strong>/day. The three metrics are ${rhrTrend <= 0 && avgSteps >= 7000 ? 'pointing in the right direction simultaneously — a positive signal' : 'in different phases — useful for understanding which lever to pull next'}.`,
-        `The sleep-to-next-day activity link is the most actionable insight in this dataset. When sleep efficiency is high and deep sleep is above 90 min, next-day step counts tend to be higher. This feedback loop — better sleep → more movement → better fitness → better sleep — is already visible in your data.`,
-        `Training load in this window shows ${anomalyCount} hard effort${anomalyCount===1?'':'s'}. ${anomalyCount > 0 ? `Those sessions produced the expected response: brief HR spikes with normal resting HR the following day. The body absorbed the load well.` : 'A recovery or base-building phase — resting HR and sleep quality should be optimal right now.'}`,
-        `Resting HR trend of <strong>${rhrTrend > 0 ? '+' : ''}${rhrTrend.toFixed(1)} bpm</strong> over this window is the summary metric for fitness direction. ${rhrTrend <= -1 ? 'Falling — adaptation is happening.' : rhrTrend <= 1 ? 'Flat — load and recovery are balanced.' : 'Rising — consider whether recovery is keeping pace with training.'}`
-      ],
-      [
-        `Over ${tfLabel}, the data shows ${sl.length} sleep sessions, ${am.length} activity days, ${hr.length} HR days. Cross-referencing: the highest-activity days are followed by above-average deep sleep — the recovery response working correctly.`,
-        `Circadian pattern this window: sleep onset and wake times tell the story of schedule consistency. Tight clustering (less than 45-minute variation) correlates with more deep sleep regardless of total duration — the body clock optimises slow-wave onset around a habitual bedtime.`,
-        `The load-recovery balance looks ${anomalyCount > 0 && rhrTrend <= 1 ? 'healthy — hard efforts being absorbed without resting HR elevation' : anomalyCount > 0 && rhrTrend > 1 ? 'slightly stressed — hard efforts plus a rising resting HR trend suggests more recovery time would help' : 'conservative — good baseline to build from'}.`,
-        `Week-over-week resting HR is the single most reliable fitness direction indicator in this dataset. ${rhrTrend <= -1 ? 'It\'s falling — keep current load and recovery balance.' : rhrTrend <= 1 ? 'It\'s flat — either maintain or add load incrementally.' : 'It\'s rising — a lighter week would let adaptation catch up.'}`
-      ]
-    ]
-  };
-
-  const tabPools = pools[tab] || pools.overview;
-  const paras = pickVariant(tabPools);
-  return paras.map(p=>`<p>${p}</p>`).join('');
-}
 
 // ─── DRAG AND DROP UPLOADS ───────────────────────────────────────────────────
 function initDragDrop() {
@@ -2177,13 +1879,7 @@ function updateTFLabel(view, arr, dateKey='date') {
 async function refreshAll() {
   const btn = document.getElementById('refreshBtn');
   btn.classList.add('spinning'); btn.disabled = true;
-  Object.keys(AI_CACHE).forEach(k => delete AI_CACHE[k]);
-  ['overview','heartrate','sleep','activity','insights'].forEach(tab => {
-    const el = document.getElementById('ai-body-'+tab);
-    if (el) el.innerHTML = '<span style="color:var(--text3);font-size:12px">Click Generate for an AI summary of your data.</span>';
-    const b = document.getElementById('ai-btn-'+tab);
-    if (b) { b.textContent = 'Generate ↗'; b.disabled = false; }
-  });
+
   await loadState();
   updateDateRange();
   const activeView = document.querySelector('.view.active');
@@ -2194,6 +1890,7 @@ async function refreshAll() {
     else if (id==='sleep')     renderSleep();
     else if (id==='activity')  renderActivity();
     else if (id==='insights')  renderInsights();
+    else if (id==='week')      renderWeekDigest();
     else if (id==='upload')    renderUploadView();
   }
   setTimeout(addExpandButtons, 50);
@@ -2378,7 +2075,7 @@ function renderInsights() {
 }
 
 // ─── SWIPE NAVIGATION ─────────────────────────────────────────────────────────
-const VIEWS = ['overview','heartrate','sleep','activity','insights','upload'];
+const VIEWS = ['overview','heartrate','sleep','activity','insights','week','upload'];
 let _curIdx = 0;
 let _touchStartX = 0, _touchStartY = 0, _touchStartTime = 0;
 let _dragging = false, _dragX = 0;
@@ -2445,6 +2142,7 @@ function showView(id) {
   document.querySelectorAll('.nav-btn').forEach(b=>{ if(b.textContent.toLowerCase().includes(id.slice(0,4))) b.classList.add('active'); });
   // Sync bottom nav
   document.querySelectorAll('.bottom-nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.view===id));
+  // No chat panel to sync anymore — chat is a full tab
   // Move swipe track
   const idx = VIEWS.indexOf(id);
   if (idx > -1) snapTo(idx, true);
@@ -2454,6 +2152,7 @@ function showView(id) {
   else if (id==='sleep') renderSleep();
   else if (id==='activity') renderActivity();
   else if (id==='insights') renderInsights();
+  else if (id==='week') renderWeekDigest();
   else if (id==='upload') { renderUploadView(); setTimeout(initDragDrop, 50); }
   setTimeout(addExpandButtons, 50);
 }
@@ -2547,7 +2246,7 @@ function closeChartModalDirect() {
   document.body.style.width = '';
   if (modalChart) { modalChart.destroy(); modalChart = null; }
 }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeChartModalDirect(); });
+
 
 
 // ─── THEME TOGGLE ─────────────────────────────────────────────────────────────
@@ -2573,6 +2272,403 @@ function toggleTheme() {
 }
 
 
+
+
+// ─── WEEKLY DIGEST ────────────────────────────────────────────────────────────
+const WEEK_AI_CACHE = {}; // keyed by week start date
+
+function getWeeks() {
+  // Build list of ISO week start dates (Monday) from all HR/step data
+  const all = [...(STATE.hr_daily||[]), ...(STATE.am_daily||[])];
+  if (!all.length) return [];
+  const weekStarts = new Set();
+  all.forEach(r => {
+    if (!r.date) return;
+    const d = new Date(r.date + 'T12:00:00');
+    const day = d.getDay(); // 0=Sun
+    const diff = (day + 6) % 7; // days since Monday
+    const mon = new Date(d);
+    mon.setDate(d.getDate() - diff);
+    weekStarts.add(mon.toISOString().slice(0,10));
+  });
+  return [...weekStarts].sort().reverse(); // newest first
+}
+
+function getWeekData(weekStart) {
+  const start = new Date(weekStart + 'T00:00:00');
+  const end   = new Date(start); end.setDate(start.getDate() + 6);
+  const endStr   = end.toISOString().slice(0,10);
+  const inWeek   = r => r.date >= weekStart && r.date <= endStr;
+
+  const hr  = (STATE.hr_daily||[]).filter(inWeek);
+  const sl  = (STATE.sleep||[]).filter(s => s.total_min >= 90 && inWeek(s));
+  const am  = (STATE.am_daily||[]).filter(inWeek);
+  const ast = (STATE.ast_daily||[]).filter(inWeek);
+
+  // Key metrics
+  const avgRestHR  = hr.length  ? +(avg(hr.map(r=>r.resting))).toFixed(1) : null;
+  const avgSleepHr = sl.length  ? +(avg(sl.map(s=>s.total_min/60))).toFixed(1) : null;
+  const avgDeep    = sl.length  ? Math.round(avg(sl.map(s=>s.deep))) : null;
+  const totalSteps = am.reduce((a,b)=>a+b.steps,0);
+  const avgSteps   = am.length  ? Math.round(totalSteps/am.length) : null;
+  const totalDist  = +ast.reduce((a,b)=>a+(b.dist_km||0),0).toFixed(1);
+  const totalCals  = ast.reduce((a,b)=>a+(b.cals||0),0);
+
+  // Best day: highest steps + good sleep
+  const allDates = [...new Set([...hr.map(r=>r.date),...am.map(r=>r.date)])].sort();
+  let bestDay = null, worstDay = null;
+  if (allDates.length) {
+    const scores = allDates.map(date => {
+      const h2 = hr.find(r=>r.date===date);
+      const a2 = am.find(r=>r.date===date);
+      const s2 = sl.find(s=>s.date===date);
+      const score = (a2?.steps||0)/1000 + (s2?.total_min/60||0)*2 - (h2?.resting||70)*0.5;
+      return { date, score,
+        steps: a2?.steps||0, sleep: s2?.total_min/60||null,
+        rhr: h2?.resting||null, deep: s2?.deep||null };
+    });
+    bestDay  = scores.reduce((a,b)=>a.score>b.score?a:b);
+    worstDay = scores.reduce((a,b)=>a.score<b.score?a:b);
+  }
+
+  return { weekStart, endStr, hr, sl, am, ast,
+    avgRestHR, avgSleepHr, avgDeep, totalSteps, avgSteps, totalDist, totalCals,
+    bestDay, worstDay, days: allDates.length };
+}
+
+function weekLabel(weekStart) {
+  const start = new Date(weekStart + 'T00:00:00');
+  const end   = new Date(start); end.setDate(start.getDate() + 6);
+  return fmt(weekStart) + ' – ' + fmt(end.toISOString().slice(0,10));
+}
+
+function chgClass(val, prev, invert) {
+  if (!prev || val === null) return 'neu';
+  const up = val > prev;
+  if (Math.abs(val - prev) < 0.5) return 'neu';
+  if (invert) return up ? 'inv-up' : 'inv-dn';
+  return up ? 'up' : 'dn';
+}
+function chgText(val, prev, unit) {
+  if (!prev || val === null) return '—';
+  const diff = val - prev;
+  const sign = diff > 0 ? '+' : '';
+  return sign + (Number.isInteger(diff) ? diff : diff.toFixed(1)) + (unit||'');
+}
+
+function renderWeekCard(wd, prevWd) {
+  const p = prevWd; // shorthand
+  const isCurrentWeek = wd.weekStart === getWeeks()[0];
+
+  // Change badges
+  const mkChg = (val, pval, unit, invert) => {
+    if (!pval || val===null) return '<span class="week-metric-chg neu">no prior data</span>';
+    const cls = chgClass(val, pval, invert);
+    const txt = chgText(val, pval, unit);
+    const arrow = val > pval ? '▲' : val < pval ? '▼' : '≈';
+    return `<span class="week-metric-chg ${cls}">${arrow} ${txt} vs prior week</span>`;
+  };
+
+  const fmtDow = date => new Date(date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'long'});
+
+  return `
+<div class="week-card">
+  <div class="week-card-header">
+    <div>
+      <div class="week-card-label">${isCurrentWeek ? '✦ This week' : 'Week of'}</div>
+      <div class="week-card-title">${weekLabel(wd.weekStart)}</div>
+    </div>
+    <span style="font-family:var(--mono);font-size:11px;color:var(--text3)">${wd.days} day${wd.days===1?'':'s'} of data</span>
+  </div>
+  <div class="week-card-body">
+    <div class="week-metrics">
+      <div class="week-metric">
+        <div class="week-metric-val">${wd.avgRestHR??'—'}<span> bpm</span></div>
+        ${mkChg(wd.avgRestHR, p?.avgRestHR, ' bpm', true)}
+        <div class="week-metric-label">Resting HR</div>
+      </div>
+      <div class="week-metric">
+        <div class="week-metric-val">${wd.avgSleepHr??'—'}<span> hrs</span></div>
+        ${mkChg(wd.avgSleepHr, p?.avgSleepHr, 'h', false)}
+        <div class="week-metric-label">Avg sleep</div>
+      </div>
+      <div class="week-metric">
+        <div class="week-metric-val">${wd.avgSteps?.toLocaleString()??'—'}</div>
+        ${mkChg(wd.avgSteps, p?.avgSteps, '', false)}
+        <div class="week-metric-label">Avg steps</div>
+      </div>
+    </div>
+
+    <div class="week-highlights">
+      <div class="week-highlight">
+        <div class="week-highlight-icon">🏆</div>
+        <div class="week-highlight-label">Best day</div>
+        <div class="week-highlight-val">${wd.bestDay ? fmtDow(wd.bestDay.date) + (wd.bestDay.steps ? ' · ' + wd.bestDay.steps.toLocaleString() + ' steps' : '') + (wd.bestDay.sleep ? ' · ' + wd.bestDay.sleep.toFixed(1) + 'h sleep' : '') : '—'}</div>
+      </div>
+      <div class="week-highlight">
+        <div class="week-highlight-icon">📊</div>
+        <div class="week-highlight-label">Active</div>
+        <div class="week-highlight-val">${wd.totalDist} km · ${wd.totalCals.toLocaleString()} kcal</div>
+      </div>
+      ${wd.avgDeep ? `<div class="week-highlight">
+        <div class="week-highlight-icon">🛌</div>
+        <div class="week-highlight-label">Deep sleep avg</div>
+        <div class="week-highlight-val">${wd.avgDeep} min/night</div>
+      </div>` : ''}
+      ${wd.worstDay && wd.days > 2 ? `<div class="week-highlight">
+        <div class="week-highlight-icon">⚠️</div>
+        <div class="week-highlight-label">Lowest day</div>
+        <div class="week-highlight-val">${fmtDow(wd.worstDay.date)}${wd.worstDay.rhr ? ' · ' + wd.worstDay.rhr + ' bpm RHR' : ''}</div>
+      </div>` : ''}
+    </div>
+
+    <div class="week-ai ${WEEK_AI_CACHE[wd.weekStart] ? '' : 'loading'}" id="week-ai-${wd.weekStart}">
+      ${WEEK_AI_CACHE[wd.weekStart] || '<span style="display:flex;align-items:center;gap:6px"><span>Generating insight</span><span class="chat-typing" style="display:inline-flex"><span></span><span></span><span></span></span></span>'}
+    </div>
+  </div>
+</div>`;
+}
+
+async function generateWeekAI(wd) {
+  const el = document.getElementById('week-ai-' + wd.weekStart);
+  if (!el || WEEK_AI_CACHE[wd.weekStart]) return;
+
+  const groqKey = localStorage.getItem('hd_groq_key');
+  if (!groqKey) {
+    el.innerHTML = '<em>Add a Groq API key in Upload → AI Chat Settings for AI insights.</em>';
+    el.classList.remove('loading');
+    return;
+  }
+
+  const prompt = `Here is one week of health data (${weekLabel(wd.weekStart)}):
+- Avg resting HR: ${wd.avgRestHR??'no data'} bpm
+- Avg sleep: ${wd.avgSleepHr??'no data'} hrs/night, avg deep sleep: ${wd.avgDeep??'—'} min
+- Avg daily steps: ${wd.avgSteps?.toLocaleString()??'no data'}, total distance: ${wd.totalDist} km
+- Active calories: ${wd.totalCals.toLocaleString()}
+- Best day: ${wd.bestDay?.date??'unknown'}
+- Days with data: ${wd.days}
+
+Write exactly 2 sentences. Be specific, use the actual numbers, and surface one non-obvious observation or pattern from this week's data. Do not give generic health advice. Be direct and personal.`;
+
+  try {
+    const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + groqKey },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        max_tokens: 120,
+        messages: [
+          { role: 'system', content: 'You are a concise personal health analyst. Answer only from data provided. Two sentences maximum.' },
+          { role: 'user', content: prompt }
+        ]
+      })
+    });
+    const data = await r.json();
+    if (data.error) throw new Error(data.error.message);
+    const text = data.choices?.[0]?.message?.content?.trim() || '';
+    WEEK_AI_CACHE[wd.weekStart] = `<p>${text}</p>`;
+    el.innerHTML = WEEK_AI_CACHE[wd.weekStart];
+    el.classList.remove('loading');
+  } catch(e) {
+    el.innerHTML = '<em style="color:var(--text3)">Could not generate insight.</em>';
+    el.classList.remove('loading');
+  }
+}
+
+function renderWeekDigest() {
+  const container = document.getElementById('week-digest-container');
+  if (!container) return;
+  const weeks = getWeeks();
+  if (!weeks.length) {
+    container.innerHTML = `<div class="week-empty"><div class="week-empty-icon">📭</div><div style="font-size:15px;font-weight:500;margin-bottom:8px;color:var(--text)">No data yet</div><div style="font-size:13px;color:var(--text3)">Upload your wearable data to see your weekly digest.</div></div>`;
+    return;
+  }
+
+  // Build week data for all weeks
+  const weekData = weeks.map(w => getWeekData(w));
+  
+  let html = '';
+  weekData.forEach((wd, i) => {
+    const prevWd = weekData[i + 1] || null;
+    if (i === 1) html += '<div class="week-divider">Previous weeks</div>';
+    html += renderWeekCard(wd, prevWd);
+  });
+  container.innerHTML = html;
+
+  // Generate AI insights for each week (staggered to avoid rate limits)
+  weekData.forEach((wd, i) => {
+    setTimeout(() => generateWeekAI(wd), i * 800);
+  });
+}
+
+
+
+// ─── FLOATING CHAT ────────────────────────────────────────────────────────────
+let CHAT_OPEN = false;
+
+function toggleChat() {
+  CHAT_OPEN = !CHAT_OPEN;
+  const panel = document.getElementById('chatPanel');
+  const fab = document.getElementById('chatFab');
+  if (panel) panel.classList.toggle('open', CHAT_OPEN);
+  if (fab) { fab.classList.toggle('open', CHAT_OPEN); fab.textContent = CHAT_OPEN ? '✕' : '💬'; }
+  if (CHAT_OPEN) {
+    const warn = document.getElementById('chatKeyWarning');
+    if (warn) warn.style.display = localStorage.getItem('hd_groq_key') ? 'none' : 'block';
+    setTimeout(() => document.getElementById('chatInput')?.focus(), 350);
+  }
+}
+
+function openAskView() {
+  // Close float panel
+  CHAT_OPEN = false;
+  const panel = document.getElementById('chatPanel');
+  const fab = document.getElementById('chatFab');
+  if (panel) panel.classList.remove('open');
+  if (fab) { fab.classList.remove('open'); fab.textContent = '💬'; }
+  // Show ask overlay
+  const askView = document.getElementById('view-ask');
+  if (askView) {
+    askView.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    // Sync history to expanded view if any messages exist
+    syncExpandedMessages();
+    setTimeout(() => document.getElementById('chatInputExpanded')?.focus(), 200);
+  }
+}
+
+function closeAskView() {
+  const askView = document.getElementById('view-ask');
+  if (askView) askView.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function syncExpandedMessages() {
+  // Copy existing chat messages into the expanded view
+  const src = document.getElementById('chatMessages');
+  const dst = document.getElementById('chatMessagesExpanded');
+  const emptyDst = document.getElementById('chatEmptyExpanded');
+  if (!src || !dst) return;
+  // If there are real messages (not just the empty state), copy them
+  const msgs = src.querySelectorAll('.chat-msg');
+  if (msgs.length > 0) {
+    if (emptyDst) emptyDst.style.display = 'none';
+    dst.innerHTML = '';
+    msgs.forEach(m => dst.appendChild(m.cloneNode(true)));
+    dst.scrollTop = dst.scrollHeight;
+  }
+}
+
+// Expanded view sends messages using shared CHAT_HISTORY
+async function sendExpandedChatMessage(text) {
+  // Reuse the same sendChatMessage but target expanded elements
+  const messagesEl = document.getElementById('chatMessagesExpanded');
+  const emptyEl = document.getElementById('chatEmptyExpanded');
+  const sendBtn = document.getElementById('chatSendExpanded');
+  if (!messagesEl || CHAT_GENERATING) return;
+  if (emptyEl) emptyEl.style.display = 'none';
+
+  CHAT_HISTORY.push({ role: 'user', content: text });
+  appendChatBubbleToEl(messagesEl, 'user', text);
+
+  const typingEl = appendTypingToEl(messagesEl);
+  CHAT_GENERATING = true;
+  if (sendBtn) sendBtn.disabled = true;
+
+  try {
+    const groqKey = localStorage.getItem('hd_groq_key') || '';
+    if (!groqKey) throw new Error('NO_KEY');
+    const messages = CHAT_HISTORY.map((m, i) => ({
+      role: m.role,
+      content: i === 0 && m.role === 'user'
+        ? 'Here is my health data:\n\n' + buildDataContext() + '\n\nMy question: ' + m.content
+        : m.content
+    }));
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + groqKey },
+      body: JSON.stringify({ model: 'llama-3.3-70b-versatile', max_tokens: 1000,
+        messages: [{ role: 'system', content: CHAT_SYSTEM }, ...messages] })
+    });
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message || 'API error');
+    const fullText = data.choices?.[0]?.message?.content || 'No response.';
+    const suggMatch = fullText.match(/SUGGESTIONS:\s*([\s\S]+)$/i);
+    const suggestions = suggMatch
+      ? suggMatch[1].trim().split('\n').map(s=>s.replace(/^[-*\u2022]\s*/,'')).filter(Boolean).slice(0,3)
+      : [];
+    const answerText = fullText.replace(/SUGGESTIONS:[\s\S]+$/i,'').trim();
+    CHAT_HISTORY.push({ role: 'assistant', content: fullText });
+    typingEl.remove();
+    const bubbleEl = appendChatBubbleToEl(messagesEl, 'ai', '');
+    await streamChatText(bubbleEl, answerText);
+    if (suggestions.length) {
+      const suggestDiv = document.createElement('div');
+      suggestDiv.className = 'chat-suggestions';
+      suggestions.forEach(s => {
+        const btn = document.createElement('button');
+        btn.className = 'chat-suggestion';
+        btn.textContent = '↗ ' + s;
+        btn.onclick = () => sendExpandedChatMessage(s);
+        suggestDiv.appendChild(btn);
+      });
+      bubbleEl.parentElement.appendChild(suggestDiv);
+    }
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  } catch(err) {
+    typingEl.remove();
+    if (err.message === 'NO_KEY') {
+      appendChatBubbleToEl(messagesEl, 'ai', '').innerHTML = '<p>Add your Groq API key in <strong>Upload → AI Chat Settings</strong> to use the AI chat.</p>';
+    } else {
+      const fallback = generateLocalChatAnswer(text);
+      CHAT_HISTORY.push({ role: 'assistant', content: fallback });
+      await streamChatText(appendChatBubbleToEl(messagesEl, 'ai', ''), fallback);
+    }
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+  CHAT_GENERATING = false;
+  if (sendBtn) sendBtn.disabled = false;
+}
+
+function sendExpandedFromInput() {
+  const input = document.getElementById('chatInputExpanded');
+  const msg = input?.value.trim();
+  if (!msg) return;
+  input.value = ''; input.style.height = 'auto';
+  sendExpandedChatMessage(msg);
+}
+
+function appendChatBubbleToEl(container, role, text) {
+  const wrap = document.createElement('div');
+  wrap.className = 'chat-msg chat-msg-' + role;
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble chat-bubble-' + role;
+  bubble.innerHTML = role === 'user' ? escapeHtml(text) : text;
+  wrap.appendChild(bubble);
+  container.appendChild(wrap);
+  container.scrollTop = container.scrollHeight;
+  return bubble;
+}
+
+function appendTypingToEl(container) {
+  const wrap = document.createElement('div');
+  wrap.className = 'chat-msg chat-msg-ai';
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble chat-bubble-ai';
+  bubble.innerHTML = '<div class="chat-typing"><span></span><span></span><span></span></div>';
+  wrap.appendChild(bubble);
+  container.appendChild(wrap);
+  container.scrollTop = container.scrollHeight;
+  return wrap;
+}
+
+// Close ask view on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (document.getElementById('view-ask')?.style.display === 'block') closeAskView();
+    else closeChartModalDirect();
+  }
+});
 
 // ─── GROQ KEY UI ──────────────────────────────────────────────────────────────
 function showGroqSetup() {
@@ -2615,23 +2711,11 @@ function removeGroqKey() {
 }
 
 // ─── ASK AI CHAT ──────────────────────────────────────────────────────────────
-let CHAT_OPEN = false;
-let CHAT_HISTORY = []; // {role, content}
+let CHAT_HISTORY = [];
 let CHAT_GENERATING = false;
 
-function toggleChat() {
-  CHAT_OPEN = !CHAT_OPEN;
-  document.getElementById('chatPanel').classList.toggle('open', CHAT_OPEN);
-  document.getElementById('chatFab').classList.toggle('open', CHAT_OPEN);
-  document.getElementById('chatFab').textContent = CHAT_OPEN ? '✕' : '💬';
-  const centreBtn = document.getElementById('bottomChatBtn');
-  if (centreBtn) centreBtn.classList.toggle('open', CHAT_OPEN);
-  if (CHAT_OPEN) {
-    setTimeout(() => document.getElementById('chatInput')?.focus(), 350);
-    const warn = document.getElementById('chatKeyWarning');
-    if (warn) warn.style.display = localStorage.getItem('hd_groq_key') ? 'none' : 'block';
-  }
-}
+
+
 
 function buildDataContext() {
   const hr  = STATE.hr_daily  || [];
