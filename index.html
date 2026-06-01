@@ -1564,6 +1564,66 @@ async function clearAllData() {
 }
 
 // ─── AI COMMENTARY ────────────────────────────────────────────────────────────
+
+// ─── TEXT STREAMING ───────────────────────────────────────────────────────────
+function streamText(el, html, onDone) {
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  const paragraphs = Array.from(div.querySelectorAll('p')).map(p => p.innerHTML);
+  el.innerHTML = '';
+  let pIdx = 0, wordIdx = 0, words = [];
+  const DELAY = 18;
+  let cursor = null;
+
+  function ensureCursor(pEl) {
+    if (cursor && cursor.parentNode) cursor.parentNode.removeChild(cursor);
+    cursor = document.createElement('span');
+    cursor.className = 'ai-cursor';
+    pEl.appendChild(cursor);
+  }
+  function removeCursor() {
+    if (cursor && cursor.parentNode) cursor.parentNode.removeChild(cursor);
+    cursor = null;
+  }
+
+  function nextPara() {
+    if (pIdx >= paragraphs.length) { removeCursor(); if (onDone) onDone(); return; }
+    words = tokenise(paragraphs[pIdx]);
+    wordIdx = 0;
+    const pEl = document.createElement('p');
+    el.appendChild(pEl);
+    ensureCursor(pEl);
+    nextWord(pEl);
+  }
+
+  function nextWord(pEl) {
+    if (wordIdx >= words.length) {
+      removeCursor(); pIdx++;
+      setTimeout(nextPara, 120); return;
+    }
+    const token = words[wordIdx++];
+    if (cursor && cursor.parentNode === pEl) {
+      cursor.insertAdjacentHTML('beforebegin', token);
+    } else {
+      pEl.innerHTML += token;
+    }
+    ensureCursor(pEl);
+    setTimeout(() => nextWord(pEl), token.startsWith('<') ? 0 : DELAY);
+  }
+  nextPara();
+}
+
+function tokenise(html) {
+  const tokens = [];
+  const re = /(<[^>]+>)|([^<\s]+)|\s+/g;
+  let m;
+  while ((m = re.exec(html)) !== null) {
+    if (m[1]) tokens.push(m[1]);
+    else if (m[2]) tokens.push(m[2] + ' ');
+  }
+  return tokens;
+}
+
 // ─── AI COLLAPSE ──────────────────────────────────────────────────────────────
 const AI_COLLAPSED = {};
 function toggleAIPanel(tab) {
@@ -1771,6 +1831,314 @@ function initDragDrop() {
   });
 }
 
+
+// ─── TIMEFRAME ────────────────────────────────────────────────────────────────
+const TF = { overview:0, heartrate:0, sleep:0, activity:0, insights:0 };
+
+function setTF(view, days) {
+  TF[view] = days;
+  document.querySelectorAll(`#tf-${view} .tf-btn`).forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.days) === days);
+  });
+  if (view==='overview')       renderOverview();
+  else if (view==='heartrate') renderHeartRate();
+  else if (view==='sleep')     renderSleep();
+  else if (view==='activity')  renderActivity();
+  else if (view==='insights')  renderInsights();
+  setTimeout(addExpandButtons, 50);
+}
+
+function filterByTF(arr, view, dateKey='date') {
+  const days = TF[view] || 0;
+  if (days === -1 || !arr || !arr.length) { updateTFLabel(view, arr, dateKey); return arr; }
+  const cutoff = new Date();
+  if (days === 0) cutoff.setDate(cutoff.getDate() - 30);
+  else cutoff.setDate(cutoff.getDate() - days);
+  const isoMin = cutoff.toISOString().slice(0,10);
+  const oldest = arr[0]?.[dateKey] || '';
+  if (oldest > isoMin) { updateTFLabel(view, arr, dateKey); return arr; }
+  const filtered = arr.filter(r => (r[dateKey]||'') >= isoMin);
+  const result = filtered.length >= 2 ? filtered : arr;
+  updateTFLabel(view, result, dateKey);
+  return result;
+}
+
+function updateTFLabel(view, arr, dateKey='date') {
+  const el = document.getElementById('tf-label-' + view);
+  if (!el) return;
+  if (!arr || !arr.length) { el.innerHTML = ''; return; }
+  const dates = arr.map(r=>r[dateKey]).filter(Boolean).sort();
+  if (!dates.length) { el.innerHTML = ''; return; }
+  const n = [...new Set(dates)].length;
+  const days = TF[view];
+  el.innerHTML = `<span style="color:var(--text2)">${fmt(dates[0])} – ${fmt(dates[dates.length-1])}</span> <span style="color:var(--text3)">·</span> <span style="color:var(--text3)">${n} day${n===1?'':'s'}</span>`;
+}
+
+// ─── REFRESH ALL ──────────────────────────────────────────────────────────────
+async function refreshAll() {
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('spinning'); btn.disabled = true;
+  Object.keys(AI_CACHE).forEach(k => delete AI_CACHE[k]);
+  ['overview','heartrate','sleep','activity','insights'].forEach(tab => {
+    const el = document.getElementById('ai-body-'+tab);
+    if (el) el.innerHTML = '<span style="color:var(--text3);font-size:12px">Click Generate for an AI summary of your data.</span>';
+    const b = document.getElementById('ai-btn-'+tab);
+    if (b) { b.textContent = 'Generate ↗'; b.disabled = false; }
+  });
+  await loadState();
+  updateDateRange();
+  const activeView = document.querySelector('.view.active');
+  if (activeView) {
+    const id = activeView.id.replace('view-','');
+    if (id==='overview')       renderOverview();
+    else if (id==='heartrate') renderHeartRate();
+    else if (id==='sleep')     renderSleep();
+    else if (id==='activity')  renderActivity();
+    else if (id==='insights')  renderInsights();
+    else if (id==='upload')    renderUploadView();
+  }
+  setTimeout(addExpandButtons, 50);
+  setTimeout(() => { btn.classList.remove('spinning'); btn.disabled = false; }, 400);
+  showToast('Dashboard refreshed');
+}
+
+// ─── INSIGHTS ─────────────────────────────────────────────────────────────────
+function pearsonR(xs, ys) {
+  const n = xs.length;
+  if (n < 3) return 0;
+  const mx = xs.reduce((a,b)=>a+b)/n, my = ys.reduce((a,b)=>a+b)/n;
+  let num=0, dx2=0, dy2=0;
+  for (let i=0;i<n;i++) { const dx=xs[i]-mx, dy=ys[i]-my; num+=dx*dy; dx2+=dx*dx; dy2+=dy*dy; }
+  return (dx2&&dy2) ? num/Math.sqrt(dx2*dy2) : 0;
+}
+
+function timeToHr(t) {
+  if (!t) return null;
+  const [hh,mm] = t.split(':').map(Number);
+  return hh + mm/60;
+}
+
+function renderInsights() {
+  const sl  = filterByTF(STATE.sleep||[], 'insights').filter(s=>s.total_min>=120);
+  const am  = filterByTF(STATE.am_daily||[], 'insights');
+  const hr  = filterByTF(STATE.hr_daily||[], 'insights');
+  const ast = filterByTF(STATE.ast_daily||[], 'insights');
+  const target = parseFloat(document.getElementById('sleepTargetHrs')?.value||8);
+  const gc = getGC();
+
+  const byDate = {};
+  sl.forEach(s => { if (!byDate[s.date] || s.total_min > byDate[s.date].total_min) byDate[s.date] = s; });
+  const nights = Object.values(byDate).sort((a,b)=>a.date.localeCompare(b.date));
+
+  let running = 0;
+  const debtDates=[], debtVals=[], nightlyHrs=[];
+  nights.forEach(n => {
+    const hrs = n.total_min/60;
+    running += hrs - target;
+    debtDates.push(n.label);
+    debtVals.push(+running.toFixed(2));
+    nightlyHrs.push(+hrs.toFixed(2));
+  });
+
+  const totalDebt = running;
+  const avgNightly = nights.length ? avg(nightlyHrs) : 0;
+  const shortNights = nights.filter(n=>n.total_min/60 < target-0.5).length;
+
+  const insDebtMetrics = document.getElementById('ins-debt-metrics');
+  if (insDebtMetrics) insDebtMetrics.innerHTML = `
+    <div class="metric"><div class="metric-label">Current balance</div>
+      <div class="metric-value" style="color:${totalDebt>=0?'var(--green)':'var(--red)'}">
+        ${totalDebt>=0?'+':''}${totalDebt.toFixed(1)} <span>hrs</span></div>
+      <div class="metric-sub">${totalDebt>=0?'surplus':'deficit'} vs ${target}h target</div></div>
+    <div class="metric"><div class="metric-label">Avg nightly</div>
+      <div class="metric-value">${avgNightly.toFixed(1)} <span>hrs</span></div></div>
+    <div class="metric"><div class="metric-label">Nights below target</div>
+      <div class="metric-value">${shortNights} <span>/ ${nights.length}</span></div></div>
+    <div class="metric"><div class="metric-label">Best night</div>
+      <div class="metric-value">${nights.length?Math.max(...nightlyHrs).toFixed(1):'—'} <span>hrs</span></div></div>
+  `;
+
+  destroyChart('ins-debt-chart');
+  if (document.getElementById('ins-debt-chart')) charts['ins-debt-chart'] = new Chart(document.getElementById('ins-debt-chart'), {
+    type:'line', data:{ labels:debtDates, datasets:[{ label:'Balance (hrs)', data:debtVals,
+      segment:{ borderColor: ctx => ctx.p1.parsed.y>=0?'#4fd1c5':'#e53e3e' },
+      backgroundColor:'rgba(79,209,197,0.08)', borderWidth:2, pointRadius:3, tension:0.3, fill:true }]},
+    options:{ ...baseOpts(undefined,undefined,v=>v+'h'), plugins:{ legend:{display:false}, tooltip:{ ...gc.tooltip, callbacks:{ label:ctx=>`Balance: ${ctx.parsed.y>0?'+':''}${ctx.parsed.y}h` } } } }
+  });
+
+  destroyChart('ins-nightly-chart');
+  if (document.getElementById('ins-nightly-chart')) charts['ins-nightly-chart'] = new Chart(document.getElementById('ins-nightly-chart'), {
+    type:'bar', data:{ labels:debtDates, datasets:[
+      { label:'Sleep hrs', data:nightlyHrs, backgroundColor:nightlyHrs.map(v=>v>=target?'rgba(128,90,213,0.6)':'rgba(229,62,62,0.5)'), borderWidth:0 },
+      { type:'line', label:'Target', data:nights.map(()=>target), borderColor:'rgba(255,255,255,0.25)', borderDash:[5,4], borderWidth:1.5, pointRadius:0 }
+    ]},
+    options:{ ...baseOpts(0,undefined,v=>v+'h'), plugins:{ legend:{display:false} } }
+  });
+
+  function normalisedOnset(t) { const hr = timeToHr(t); return hr===null?null:(hr>=18?hr-24:hr); }
+  const onsets = nights.map(n=>normalisedOnset(n.start)).filter(v=>v!==null);
+  const wakes  = nights.map(n=>timeToHr(n.end)).filter(v=>v!==null);
+  const onsetStd = onsets.length ? Math.sqrt(avg(onsets.map(v=>(v-avg(onsets))**2))) : 0;
+  const wakeStd  = wakes.length  ? Math.sqrt(avg(wakes.map(v=>(v-avg(wakes))**2)))   : 0;
+  const consistencyScore = Math.max(0, Math.round(100 - (onsetStd+wakeStd)*10));
+
+  const insCircMetrics = document.getElementById('ins-circadian-metrics');
+  if (insCircMetrics) insCircMetrics.innerHTML = `
+    <div class="metric metric-accent"><div class="metric-label">Consistency score</div>
+      <div class="metric-value">${consistencyScore}<span>/100</span></div>
+      <div class="metric-sub">higher = more regular</div></div>
+    <div class="metric"><div class="metric-label">Sleep onset SD</div>
+      <div class="metric-value">${onsetStd.toFixed(1)} <span>hrs</span></div></div>
+    <div class="metric"><div class="metric-label">Wake time SD</div>
+      <div class="metric-value">${wakeStd.toFixed(1)} <span>hrs</span></div></div>
+  `;
+
+  destroyChart('ins-circadian-chart');
+  if (document.getElementById('ins-circadian-chart')) charts['ins-circadian-chart'] = new Chart(document.getElementById('ins-circadian-chart'), {
+    type:'line', data:{ labels:nights.map(n=>n.label), datasets:[
+      { label:'Sleep onset', data:nights.map(n=>normalisedOnset(n.start)), borderColor:'#4fd1c5', borderWidth:2, pointRadius:4, tension:0.2, backgroundColor:'transparent' },
+      { label:'Wake time',   data:nights.map(n=>timeToHr(n.end)),          borderColor:'#f6ad55', borderWidth:2, pointRadius:4, tension:0.2, backgroundColor:'transparent' }
+    ]},
+    options:{ ...baseOpts(), plugins:{ legend:{display:false} } }
+  });
+
+  const amMap = Object.fromEntries(am.map(r=>[r.date,r.steps]));
+  const corrData1 = nights.map(n => {
+    const next = new Date(n.date+'T12:00:00'); next.setDate(next.getDate()+1);
+    const nd = next.toISOString().slice(0,10);
+    const steps = amMap[nd];
+    return steps!=null ? { x:+n.efficiency.toFixed(1), y:steps, label:n.label } : null;
+  }).filter(Boolean);
+  const r1 = pearsonR(corrData1.map(d=>d.x), corrData1.map(d=>d.y));
+
+  const hrMap = Object.fromEntries(hr.map(r=>[r.date,r]));
+  const astMap = Object.fromEntries(ast.map(r=>[r.date,r]));
+  const corrData2 = nights.map(n => {
+    const h2 = hrMap[n.date], a = astMap[n.date];
+    if (!h2||!a) return null;
+    const load = Math.min(a.active_min||0,400)*(1+(h2.max-h2.resting)/100);
+    return { x:+load.toFixed(0), y:n.deep, label:n.label };
+  }).filter(Boolean);
+  const r2 = pearsonR(corrData2.map(d=>d.x), corrData2.map(d=>d.y));
+
+  const hrSorted = [...hr].sort((a,b)=>a.date.localeCompare(b.date));
+  const weekBuckets = {};
+  hrSorted.forEach(r => {
+    const dt = new Date(r.date+'T12:00:00');
+    const mon = new Date(dt); mon.setDate(dt.getDate()-((dt.getDay()+6)%7));
+    const wk = mon.toISOString().slice(0,10);
+    if (!weekBuckets[wk]) weekBuckets[wk] = [];
+    weekBuckets[wk].push(r.resting);
+  });
+  const wkLabels = Object.keys(weekBuckets).sort();
+  const wkAvgs = wkLabels.map(w=>+avg(weekBuckets[w]).toFixed(1));
+  const rhrTrend = wkAvgs.length>1 ? wkAvgs[wkAvgs.length-1]-wkAvgs[0] : 0;
+
+  const insCorrMetrics = document.getElementById('ins-corr-metrics');
+  if (insCorrMetrics) insCorrMetrics.innerHTML = `
+    <div class="metric"><div class="metric-label">Sleep→steps r</div>
+      <div class="metric-value" style="color:${Math.abs(r1)>0.3?'var(--accent)':'var(--text2)'}">r = ${r1.toFixed(2)}</div>
+      <div class="metric-sub">${Math.abs(r1)<0.2?'weak':Math.abs(r1)<0.4?'moderate':'strong'} ${r1>0?'positive':'negative'}</div></div>
+    <div class="metric"><div class="metric-label">Load→deep sleep r</div>
+      <div class="metric-value" style="color:${Math.abs(r2)>0.3?'var(--accent)':'var(--text2)'}">r = ${r2.toFixed(2)}</div>
+      <div class="metric-sub">${Math.abs(r2)<0.2?'weak':Math.abs(r2)<0.4?'moderate':'strong'} ${r2>0?'positive':'negative'}</div></div>
+    <div class="metric"><div class="metric-label">RHR trend</div>
+      <div class="metric-value" style="color:${rhrTrend<=0?'var(--green)':'var(--red)'}">${rhrTrend>0?'+':''}${rhrTrend.toFixed(1)} <span>bpm</span></div>
+      <div class="metric-sub">${rhrTrend<=0?'improving':'elevated'}</div></div>
+  `;
+
+  destroyChart('ins-corr1-chart');
+  if (document.getElementById('ins-corr1-chart')) charts['ins-corr1-chart'] = new Chart(document.getElementById('ins-corr1-chart'), {
+    type:'scatter', data:{ datasets:[{ label:'Sleep eff→steps', data:corrData1, backgroundColor:'rgba(99,179,237,0.6)', pointRadius:6 }]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ ...gc.tooltip, callbacks:{ label:ctx=>`${ctx.raw.label}: ${ctx.raw.x}% → ${ctx.raw.y.toLocaleString()}` } } },
+      scales:{ x:{ title:{display:true,text:'Sleep efficiency (%)',color:gc.tcolor,font:{size:11}}, ticks:{color:gc.tcolor}, grid:{color:gc.color} }, y:{ title:{display:true,text:'Next-day steps',color:gc.tcolor,font:{size:11}}, ticks:{color:gc.tcolor,callback:v=>v>=1000?Math.round(v/1000)+'k':v}, grid:{color:gc.color} } }
+    }
+  });
+
+  destroyChart('ins-corr2-chart');
+  if (document.getElementById('ins-corr2-chart')) charts['ins-corr2-chart'] = new Chart(document.getElementById('ins-corr2-chart'), {
+    type:'scatter', data:{ datasets:[{ label:'Load→deep', data:corrData2, backgroundColor:'rgba(246,173,85,0.65)', pointRadius:6 }]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ ...gc.tooltip, callbacks:{ label:ctx=>`${ctx.raw.label}: load ${ctx.raw.x} → ${ctx.raw.y}min` } } },
+      scales:{ x:{ title:{display:true,text:'Training load',color:gc.tcolor,font:{size:11}}, ticks:{color:gc.tcolor}, grid:{color:gc.color} }, y:{ title:{display:true,text:'Deep sleep (min)',color:gc.tcolor,font:{size:11}}, ticks:{color:gc.tcolor}, grid:{color:gc.color} } }
+    }
+  });
+
+  destroyChart('ins-rhr-chart');
+  if (document.getElementById('ins-rhr-chart')) charts['ins-rhr-chart'] = new Chart(document.getElementById('ins-rhr-chart'), {
+    type:'bar', data:{ labels:hrSorted.map(r=>fmt(r.date)), datasets:[
+      { type:'bar',  label:'Daily RHR', data:hrSorted.map(r=>r.resting), backgroundColor:'rgba(229,62,62,0.25)', borderWidth:0, order:2 },
+      { type:'line', label:'Weekly avg', data:(()=>{ const out=new Array(hrSorted.length).fill(null); hrSorted.forEach((r,i)=>{ const wk=wkLabels.find(w=>{ const wd=new Date(w); const rd=new Date(r.date+'T12:00:00'); return rd>=wd&&rd<new Date(wd.getTime()+7*864e5); }); if(wk){ out[i]=wkAvgs[wkLabels.indexOf(wk)]; } }); return out; })(),
+        borderColor:'#4fd1c5', borderWidth:2.5, pointRadius:0, tension:0, spanGaps:true, order:1, backgroundColor:'transparent' }
+    ]},
+    options:{ ...baseOpts(50,undefined,v=>v+' bpm'), plugins:{ legend:{display:false} } }
+  });
+
+  setTimeout(addExpandButtons, 50);
+}
+
+// ─── SWIPE NAVIGATION ─────────────────────────────────────────────────────────
+const VIEWS = ['overview','heartrate','sleep','activity','insights','upload'];
+let _curIdx = 0;
+let _touchStartX = 0, _touchStartY = 0, _touchStartTime = 0;
+let _dragging = false, _dragX = 0;
+
+function isMobile() { return window.innerWidth <= 768; }
+function getTrack() { return document.getElementById('viewTrack'); }
+function getSlideWidth() { const clip = document.querySelector('.swipe-clip'); return clip ? clip.getBoundingClientRect().width : window.innerWidth; }
+
+function setTrackX(px, animated) {
+  const track = getTrack();
+  if (!track) return;
+  track.style.transition = animated ? 'transform .32s cubic-bezier(.4,0,.2,1)' : 'none';
+  track.style.transform = 'translateX(' + px + 'px)';
+}
+
+function snapTo(idx, animated) {
+  _curIdx = Math.max(0, Math.min(idx, VIEWS.length - 1));
+  setTrackX(-_curIdx * getSlideWidth(), animated);
+}
+
+document.addEventListener('touchstart', e => {
+  if (!isMobile()) return;
+  if (document.getElementById('chartModal')?.classList.contains('open')) return;
+  if (e.target.closest('.tf-btns, .table-scroll, .upload-grid, .sb-input, input, textarea, select, .chart-modal-overlay, .bottom-nav')) return;
+  _touchStartX = e.touches[0].clientX;
+  _touchStartY = e.touches[0].clientY;
+  _touchStartTime = Date.now();
+  _dragging = false; _dragX = 0;
+}, { passive: true });
+
+document.addEventListener('touchmove', e => {
+  if (!isMobile() || _touchStartX === 0) return;
+  const dx = e.touches[0].clientX - _touchStartX;
+  const dy = e.touches[0].clientY - _touchStartY;
+  if (!_dragging) {
+    if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+    if (Math.abs(dy) >= Math.abs(dx)) { _touchStartX = 0; return; }
+    _dragging = true;
+  }
+  _dragX = dx;
+  let bounded = dx;
+  if ((_curIdx === 0 && dx > 0) || (_curIdx === VIEWS.length-1 && dx < 0)) bounded = dx * 0.2;
+  setTrackX(-_curIdx * getSlideWidth() + bounded, false);
+}, { passive: true });
+
+document.addEventListener('touchend', e => {
+  if (!isMobile() || !_dragging) { _touchStartX = 0; _dragging = false; return; }
+  const dx = _dragX, dt = Date.now() - _touchStartTime;
+  _dragging = false; _touchStartX = 0;
+  const W = getSlideWidth();
+  const isFlick = Math.abs(dx) > 50 && dt < 300;
+  const isPast  = Math.abs(dx) > W * 0.3;
+  if ((isFlick||isPast) && dx < 0 && _curIdx < VIEWS.length-1) showView(VIEWS[_curIdx+1]);
+  else if ((isFlick||isPast) && dx > 0 && _curIdx > 0) showView(VIEWS[_curIdx-1]);
+  else snapTo(_curIdx, true);
+}, { passive: true });
+
+window.addEventListener('resize', () => { snapTo(_curIdx, false); });
+
 function showView(id) {
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
@@ -1786,6 +2154,7 @@ function showView(id) {
   else if (id==='heartrate') renderHeartRate();
   else if (id==='sleep') renderSleep();
   else if (id==='activity') renderActivity();
+  else if (id==='insights') renderInsights();
   else if (id==='insights') renderInsights();
   else if (id==='upload') { renderUploadView(); setTimeout(initDragDrop, 50); }
   setTimeout(addExpandButtons, 50);
@@ -1882,85 +2251,6 @@ function closeChartModalDirect() {
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeChartModalDirect(); });
 
-
-// ─── SWIPE NAVIGATION ─────────────────────────────────────────────────────────
-const VIEWS = ['overview','heartrate','sleep','activity','insights','upload'];
-let _curIdx = 0;
-let _touchStartX = 0, _touchStartY = 0, _touchStartTime = 0;
-let _dragging = false, _dragX = 0;
-
-function isMobile() { return window.innerWidth <= 768; }
-
-function getTrack() { return document.getElementById('viewTrack'); }
-
-function getSlideWidth() {
-  // Use clip container width, not window.innerWidth, to avoid scrollbar offset
-  const clip = document.querySelector('.swipe-clip');
-  return clip ? clip.getBoundingClientRect().width : window.innerWidth;
-}
-
-function setTrackX(px, animated) {
-  const track = getTrack();
-  if (!track) return;
-  track.style.transition = animated ? 'transform .32s cubic-bezier(.4,0,.2,1)' : 'none';
-  track.style.transform = 'translateX(' + px + 'px)';
-}
-
-function snapTo(idx, animated) {
-  _curIdx = Math.max(0, Math.min(idx, VIEWS.length - 1));
-  setTrackX(-_curIdx * getSlideWidth(), animated);
-}
-
-document.addEventListener('touchstart', e => {
-  if (!isMobile()) return;
-  // Ignore touches on scrollable/interactive elements
-  if (document.getElementById('chartModal')?.classList.contains('open')) return;
-  if (e.target.closest('.tf-btns, .table-scroll, .upload-grid, .sb-input, input, textarea, select, .chart-modal-overlay, .bottom-nav')) return;
-  _touchStartX = e.touches[0].clientX;
-  _touchStartY = e.touches[0].clientY;
-  _touchStartTime = Date.now();
-  _dragging = false;
-  _dragX = 0;
-}, { passive: true });
-
-document.addEventListener('touchmove', e => {
-  if (!isMobile() || _touchStartX === 0) return;
-  const dx = e.touches[0].clientX - _touchStartX;
-  const dy = e.touches[0].clientY - _touchStartY;
-  // Decide: horizontal or vertical?
-  if (!_dragging) {
-    if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return; // not moved enough yet
-    if (Math.abs(dy) >= Math.abs(dx)) { _touchStartX = 0; return; } // vertical — release
-    _dragging = true;
-  }
-  _dragX = dx;
-  // Rubber-band at edges
-  let bounded = dx;
-  if ((_curIdx === 0 && dx > 0) || (_curIdx === VIEWS.length - 1 && dx < 0)) {
-    bounded = dx * 0.2; // resist past edge
-  }
-  setTrackX(-_curIdx * getSlideWidth() + bounded, false);
-}, { passive: true });
-
-document.addEventListener('touchend', e => {
-  if (!isMobile() || !_dragging) { _touchStartX = 0; _dragging = false; return; }
-  const dx = _dragX;
-  const dt = Date.now() - _touchStartTime;
-  _dragging = false;
-  _touchStartX = 0;
-  const W = getSlideWidth();
-  const isFlick = Math.abs(dx) > 50 && dt < 300;
-  const isPast  = Math.abs(dx) > W * 0.3;
-  if ((isFlick || isPast) && dx < 0 && _curIdx < VIEWS.length - 1) {
-    showView(VIEWS[_curIdx + 1]);
-  } else if ((isFlick || isPast) && dx > 0 && _curIdx > 0) {
-    showView(VIEWS[_curIdx - 1]);
-  } else {
-    snapTo(_curIdx, true); // snap back
-  }
-}, { passive: true });
-
-window.addEventListener('resize', () => { snapTo(_curIdx, false); });
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 const savedTheme = localStorage.getItem('hd_theme') || 'dark';
 document.documentElement.setAttribute('data-theme', savedTheme);
