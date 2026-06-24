@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Health">
@@ -313,7 +313,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
 .sb-panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:20px;margin-bottom:20px}
 .sb-panel.sb-connected{border-color:var(--green)}
 .sb-panel.sb-error{border-color:var(--red)}
-.sb-input{width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:12px;padding:8px 12px;border-radius:6px;margin-top:6px;outline:none;transition:border-color .15s}
+.sb-input{width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:16px;padding:8px 12px;border-radius:6px;margin-top:6px;outline:none;transition:border-color .15s}
 .sb-input:focus{border-color:var(--accent)}
 .sb-input::placeholder{color:var(--text3)}
 .sb-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
@@ -576,12 +576,13 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
 }
 .chat-input{
   flex:1;background:var(--bg3);border:1px solid var(--border2);
-  color:var(--text);font-family:var(--font);font-size:13px;
+  color:var(--text);font-family:var(--font);font-size:16px;
   padding:8px 11px;border-radius:10px;resize:none;outline:none;
   line-height:1.4;max-height:100px;transition:border-color .15s;
 }
 .chat-input:focus{border-color:var(--accent)}
 .chat-input::placeholder{color:var(--text3)}
+@media(min-width:769px){.chat-input{font-size:13px}}
 .chat-send{
   background:var(--accent);border:none;color:#0d2e2b;
   width:34px;height:34px;border-radius:8px;cursor:pointer;
@@ -624,7 +625,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
 #view-ask .ask-inner{
   max-width:720px;margin:0 auto;
   display:flex;flex-direction:column;
-  height:calc(100vh - env(safe-area-inset-top,0px));
+  height:calc(100dvh - env(safe-area-inset-top,0px));height:calc(100vh - env(safe-area-inset-top,0px));
   padding:20px 20px 0;box-sizing:border-box;
 }
 #view-ask .ask-header{
@@ -690,6 +691,17 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
       </div>
       <div class="page-title">🏠 Overview</div>
             <div class="overview-grid" id="ov-cards"></div>
+      <!-- DEEP ANALYSIS CTA -->
+      <div id="deepAnalysisBar" style="background:linear-gradient(135deg,rgba(79,209,197,0.08),rgba(99,179,237,0.06));border:1px solid var(--accent);border-radius:var(--r2);padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px">✦ Deep Analysis</div>
+          <div style="font-size:12px;color:var(--text3)">Generate a prompt with all your data — paste into Claude for an in-depth personal analysis</div>
+        </div>
+        <button onclick="copyDeepAnalysis()" id="deepAnalysisBtn" style="background:var(--accent);border:none;color:#0d2e2b;font-family:var(--font);font-size:13px;font-weight:500;padding:9px 18px;border-radius:8px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:opacity .15s">
+          Copy prompt ↗
+        </button>
+      </div>
+
       <div class="section">
         <div class="section-header"><span class="section-title">30-day trend</span><span class="section-sub">steps · resting HR · sleep duration</span></div>
         <div class="chart-wrap">
@@ -1067,7 +1079,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
   </div><!-- /swipe-clip -->
   
 <!-- ASK AI FULL VIEW (overlay, not in swipe track) -->
-<div id="view-ask" style="display:none;position:fixed;inset:0;z-index:190;">
+<div id="view-ask" style="display:none;position:fixed;inset:0;z-index:190;overflow:hidden;">
   <div class="ask-inner">
     <div class="ask-header">
       <div>
@@ -2936,6 +2948,198 @@ document.addEventListener('touchend', e => {
 // Sync drawer active state with showView
 const _origShowView = showView;
 // (patch inline — drawerNav calls showView which already syncs data-view buttons)
+
+
+// ─── DEEP ANALYSIS PROMPT ─────────────────────────────────────────────────────
+function buildDeepPrompt() {
+  const hr  = STATE.hr_daily  || [];
+  const sl  = (STATE.sleep||[]).filter(s=>s.total_min>=120);
+  const am  = STATE.am_daily  || [];
+  const ast = STATE.ast_daily || [];
+
+  if (!hr.length && !sl.length && !am.length) {
+    return null;
+  }
+
+  const dates = [...hr.map(r=>r.date),...am.map(r=>r.date)].sort();
+  const dateRange = dates.length ? `${dates[0]} to ${dates[dates.length-1]}` : 'unknown';
+
+  // ── Heart rate ────────────────────────────────────────────────────────────
+  const hrSorted = [...hr].sort((a,b)=>a.date.localeCompare(b.date));
+  const avgRest = hr.length ? (hr.reduce((a,b)=>a+b.resting,0)/hr.length).toFixed(1) : 'N/A';
+  const avgMean = hr.length ? (hr.reduce((a,b)=>a+b.mean,0)/hr.length).toFixed(1) : 'N/A';
+  const maxHR   = hr.length ? Math.max(...hr.map(r=>r.max)) : 'N/A';
+  const minHR   = hr.length ? Math.min(...hr.map(r=>r.min)) : 'N/A';
+  const firstWkRHR = hrSorted.slice(0,7).length ? (hrSorted.slice(0,7).reduce((a,b)=>a+b.resting,0)/hrSorted.slice(0,7).length).toFixed(1) : 'N/A';
+  const lastWkRHR  = hrSorted.slice(-7).length  ? (hrSorted.slice(-7).reduce((a,b)=>a+b.resting,0)/hrSorted.slice(-7).length).toFixed(1)  : 'N/A';
+  const anomalyDays = hr.filter(r=>r.max>160).map(r=>`${r.date}(peak:${r.max}bpm,resting:${r.resting}bpm)`);
+  const hrByWeek = {};
+  hrSorted.forEach(r => {
+    const d = new Date(r.date+'T12:00:00'), mon = new Date(d);
+    mon.setDate(d.getDate()-((d.getDay()+6)%7));
+    const wk = mon.toISOString().slice(0,10);
+    if (!hrByWeek[wk]) hrByWeek[wk] = [];
+    hrByWeek[wk].push(r.resting);
+  });
+  const hrWeekly = Object.entries(hrByWeek).sort().map(([w,v])=>
+    `  Week of ${w}: avg resting ${(v.reduce((a,b)=>a+b,0)/v.length).toFixed(1)} bpm`
+  ).join('\n');
+  const hrDaily = hrSorted.map(r =>
+    `  ${r.date}: resting=${r.resting}, mean=${Math.round(r.mean)}, max=${r.max}, min=${r.min}`
+  ).join('\n');
+
+  // ── Sleep ─────────────────────────────────────────────────────────────────
+  const slSorted = [...sl].sort((a,b)=>a.date.localeCompare(b.date));
+  const avgSleep = sl.length ? (sl.reduce((a,b)=>a+b.total_min/60,0)/sl.length).toFixed(2) : 'N/A';
+  const avgDeep  = sl.length ? (sl.reduce((a,b)=>a+b.deep,0)/sl.length).toFixed(0) : 'N/A';
+  const avgREM   = sl.length ? (sl.reduce((a,b)=>a+b.rem,0)/sl.length).toFixed(0) : 'N/A';
+  const avgEff   = sl.length ? (sl.reduce((a,b)=>a+b.efficiency,0)/sl.length).toFixed(1) : 'N/A';
+  const bestDeep = sl.length ? sl.reduce((a,b)=>a.deep>b.deep?a:b) : null;
+  const slByDow = {};
+  sl.forEach(s => {
+    const dow = new Date(s.date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'long'});
+    if (!slByDow[dow]) slByDow[dow] = {dur:[],deep:[],rem:[]};
+    slByDow[dow].dur.push(s.total_min/60);
+    slByDow[dow].deep.push(s.deep);
+    slByDow[dow].rem.push(s.rem);
+  });
+  const slDow = Object.entries(slByDow).map(([d,v])=>
+    `  ${d}: avg ${(v.dur.reduce((a,b)=>a+b,0)/v.dur.length).toFixed(1)}h, deep ${Math.round(v.deep.reduce((a,b)=>a+b,0)/v.deep.length)}min, REM ${Math.round(v.rem.reduce((a,b)=>a+b,0)/v.rem.length)}min`
+  ).join('\n');
+  const slDaily = slSorted.map(s =>
+    `  ${s.date}: ${(s.total_min/60).toFixed(1)}h total, deep=${s.deep}min, REM=${s.rem}min, efficiency=${s.efficiency}%, sleep@${s.start}, wake@${s.end}${s.avg_hr?', avg_hr='+s.avg_hr:''}` 
+  ).join('\n');
+
+  // ── Activity ──────────────────────────────────────────────────────────────
+  const amSorted = [...am].sort((a,b)=>a.date.localeCompare(b.date));
+  const avgSteps = am.length ? Math.round(am.reduce((a,b)=>a+b.steps,0)/am.length) : 'N/A';
+  const maxSteps = am.length ? Math.max(...am.map(r=>r.steps)) : 'N/A';
+  const maxStepsDay = am.find(r=>r.steps===maxSteps);
+  const daysAbove10k = am.filter(r=>r.steps>=10000).length;
+  const rolling = amSorted.map((r,i)=>{
+    const w=amSorted.slice(Math.max(0,i-6),i+1);
+    return Math.round(w.reduce((a,b)=>a+b.steps,0)/w.length);
+  });
+  const firstRoll = rolling[0]||0, lastRoll = rolling[rolling.length-1]||0;
+  const totalDist = ast.reduce((a,b)=>a+(b.dist_km||0),0).toFixed(1);
+  const totalCals = ast.reduce((a,b)=>a+(b.cals||0),0);
+  const highCalDays = ast.filter(r=>r.cals>400);
+  const amDaily = amSorted.map(r=>`  ${r.date}: ${r.steps} steps`).join('\n');
+
+  // ── Cross-correlations ────────────────────────────────────────────────────
+  const amMap = Object.fromEntries(am.map(r=>[r.date,r.steps]));
+  const hrMap = Object.fromEntries(hr.map(r=>[r.date,r]));
+  const sleepToSteps = sl.map(s => {
+    const next = new Date(s.date+'T12:00:00'); next.setDate(next.getDate()+1);
+    const nd = next.toISOString().slice(0,10);
+    return amMap[nd] != null ? { sleep_eff:s.efficiency, deep:s.deep, next_steps:amMap[nd] } : null;
+  }).filter(Boolean);
+  const avgStepsAfterGoodSleep = sleepToSteps.filter(d=>d.sleep_eff>=95).length
+    ? Math.round(sleepToSteps.filter(d=>d.sleep_eff>=95).reduce((a,b)=>a+b.next_steps,0)/sleepToSteps.filter(d=>d.sleep_eff>=95).length)
+    : 'N/A';
+  const avgStepsAfterPoorSleep = sleepToSteps.filter(d=>d.sleep_eff<90).length
+    ? Math.round(sleepToSteps.filter(d=>d.sleep_eff<90).reduce((a,b)=>a+b.next_steps,0)/sleepToSteps.filter(d=>d.sleep_eff<90).length)
+    : 'N/A';
+
+  const NL = String.fromCharCode(10);
+
+  return `You are analysing personal health data from a wearable device. Below is the complete dataset. Please provide a comprehensive, deeply personal analysis covering:
+
+1. CARDIOVASCULAR TREND — How is fitness actually changing? Is resting HR improving, stable, or declining? What does the week-over-week pattern suggest about adaptation vs fatigue?
+
+2. SLEEP QUALITY — What are the strongest and weakest elements of sleep? Which day-of-week patterns stand out? How does sleep efficiency and deep sleep relate to training load?
+
+3. ACTIVITY PROGRESSION — Characterise the step/distance trajectory. Are there distinct phases (rest, build, peak)? What do the high-intensity sessions (>400 kcal) reveal about training pattern?
+
+4. CROSS-DATASET INSIGHTS — What non-obvious patterns emerge when looking across HR, sleep, and activity together? What does the data suggest about recovery quality?
+
+5. SPECIFIC OBSERVATIONS — Call out the 3-5 most interesting specific data points or anomalies with their dates. Be precise with numbers.
+
+6. ACTIONABLE RECOMMENDATIONS — Based only on what the data shows, what 3 concrete changes would most improve this person's health metrics? Be specific, not generic.
+
+Be direct, analytical, and precise. Reference actual dates and numbers. Avoid generic health advice — everything must be grounded in this specific dataset.
+
+═══════════════════════════════════════
+DATASET: ${dateRange} (${hr.length} HR days, ${sl.length} sleep sessions, ${am.length} activity days)
+═══════════════════════════════════════
+
+── HEART RATE SUMMARY ──
+Average resting HR: ${avgRest} bpm
+Average daily mean HR: ${avgMean} bpm  
+All-time max HR: ${maxHR} bpm | All-time min: ${minHR} bpm
+First week avg resting HR: ${firstWkRHR} bpm → Last week avg: ${lastWkRHR} bpm
+RHR change over period: ${lastWkRHR !== 'N/A' && firstWkRHR !== 'N/A' ? (parseFloat(lastWkRHR)-parseFloat(firstWkRHR)).toFixed(1)+' bpm' : 'N/A'}
+
+High-intensity days (HR peak >160 bpm):
+${anomalyDays.length ? anomalyDays.map(d=>'  '+d).join(NL) : '  None'}
+
+Weekly resting HR averages:
+${hrWeekly}
+
+Daily HR data:
+${hrDaily}
+
+── SLEEP SUMMARY ──
+Average duration: ${avgSleep} hrs/night
+Average deep sleep: ${avgDeep} min/night
+Average REM sleep: ${avgREM} min/night  
+Average efficiency: ${avgEff}%
+Best deep sleep night: ${bestDeep ? bestDeep.date+' ('+bestDeep.deep+'min deep, '+(bestDeep.total_min/60).toFixed(1)+'h total)' : 'N/A'}
+
+Sleep by day of week:
+${slDow}
+
+Daily sleep data:
+${slDaily}
+
+── ACTIVITY SUMMARY ──
+Average daily steps: ${typeof avgSteps === 'number' ? avgSteps.toLocaleString() : avgSteps}
+Best single day: ${typeof maxSteps === 'number' ? maxSteps.toLocaleString() : maxSteps} steps (${maxStepsDay?.date || 'N/A'})
+Days above 10,000 steps: ${daysAbove10k} of ${am.length}
+Step trend: 7-day avg went from ${firstRoll.toLocaleString()} → ${lastRoll.toLocaleString()} (${lastRoll > firstRoll ? '+' : ''}${(((lastRoll-firstRoll)/Math.max(firstRoll,1))*100).toFixed(0)}% change)
+Total distance: ${totalDist} km | Total active calories: ${totalCals.toLocaleString()}
+High-output sessions (>400 kcal): ${highCalDays.length} sessions on ${highCalDays.map(r=>r.date).join(', ')||'none'}
+
+Daily step data:
+${amDaily}
+
+── CROSS-DATASET CORRELATIONS ──
+Avg next-day steps after high-efficiency sleep (≥95%): ${typeof avgStepsAfterGoodSleep === 'number' ? avgStepsAfterGoodSleep.toLocaleString() : avgStepsAfterGoodSleep} steps
+Avg next-day steps after poor-efficiency sleep (<90%): ${typeof avgStepsAfterPoorSleep === 'number' ? avgStepsAfterPoorSleep.toLocaleString() : avgStepsAfterPoorSleep} steps
+
+═══════════════════════════════════════
+END OF DATA — please provide your analysis now.
+═══════════════════════════════════════`;
+}
+
+async function copyDeepAnalysis() {
+  const btn = document.getElementById('deepAnalysisBtn');
+  const prompt = buildDeepPrompt();
+  
+  if (!prompt) {
+    showToast('No data to analyse yet — upload your files first');
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(prompt);
+    btn.textContent = '✓ Copied!';
+    btn.style.background = 'var(--green)';
+    showToast('Prompt copied — paste it into Claude at claude.ai');
+    setTimeout(() => {
+      btn.textContent = 'Copy prompt ↗';
+      btn.style.background = 'var(--accent)';
+    }, 3000);
+  } catch(e) {
+    // Fallback: download as .txt file
+    const blob = new Blob([prompt], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'health-analysis-prompt.txt';
+    a.click(); URL.revokeObjectURL(url);
+    showToast('Downloaded as text file — paste contents into Claude');
+  }
+}
 
 // ─── GROQ KEY UI ──────────────────────────────────────────────────────────────
 function showGroqSetup() {
